@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spark the Circuit - Microcontroller Dictionary</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1e293b; padding: 30px; line-height: 1.6; }
+        .nav-container { max-width: 1350px; margin: 0 auto; }
+        .back-btn { display: inline-block; margin-bottom: 20px; color: #0284c7; text-decoration: none; font-weight: bold; font-size: 1rem; }
+        .back-btn:hover { text-decoration: underline; }
+        
+        header { text-align: center; margin-bottom: 40px; }
+        h1 { color: #0f172a; margin-bottom: 10px; font-size: 2.5rem; }
+        header p { color: #475569; font-size: 1.1rem; max-width: 800px; margin: 0 auto; }
+
+        .search-box { width: 100%; max-width: 500px; padding: 12px 20px; margin: 0 auto 40px auto; display: block; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: #ffffff; outline: none; }
+        .search-box:focus { border-color: #0284c7; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
+        
+        .section-title { color: #0f172a; border-bottom: 2px solid #cbd5e1; padding-bottom: 8px; margin: 40px 0 20px; font-size: 1.6rem; }
+        
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        @media(max-width: 1024px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+        @media(max-width: 650px) { .grid { grid-template-columns: 1fr; } }
+        
+        .card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-color: #0284c7; }
+        .card h3 { color: #0284c7; margin-bottom: 10px; font-size: 1.3rem; }
+        
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; margin-bottom: 12px; text-transform: uppercase; }
+        .official { background-color: #0284c7; color: white; }
+        .unofficial { background-color: #d97706; color: white; }
+        .thirdparty { background-color: #7c3aed; color: white; }
+        
+        .card-preview { font-size: 0.9rem; color: #475569; margin-bottom: 15px; }
+        .view-btn { background: #f1f5f9; color: #0284c7; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; display: inline-block; }
+        .card:hover .view-btn { background: #0284c7; color: white; border-color: #0284c7; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: #ffffff; max-width: 800px; width: 100%; max-height: 85vh; overflow-y: auto; border-radius: 16px; padding: 40px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; }
+        .modal-close { position: absolute; top: 20px; right: 25px; background: #f1f5f9; border: none; font-size: 1.5rem; font-weight: bold; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; color: #1e293b; display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: #e2e8f0; }
+        .modal-title { color: #0f172a; font-size: 2rem; margin-bottom: 15px; }
+        .modal-body { font-size: 1.05rem; color: #334155; line-height: 1.8; }
+        .modal-body p { margin-bottom: 16px; }
+    </style>
+    <script>
+        function filterBoards() {
+            let input = document.getElementById('searchInput').value.toLowerCase();
+            let cards = document.getElementsByClassName('card');
+            for (let i = 0; i < cards.length; i++) {
+                let text = cards[i].innerText.toLowerCase();
+                cards[i].style.display = text.includes(input) ? "" : "none";
+            }
+        }
+
+        function openModal(title, badgeClass, badgeText, contentHtml) {
+            document.getElementById('modalTitle').innerText = title;
+            let badge = document.getElementById('modalBadge');
+            badge.className = "badge " + badgeClass;
+            badge.innerText = badgeText;
+            document.getElementById('modalBody').innerHTML = contentHtml;
+            document.getElementById('boardModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('boardModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            let modal = document.getElementById('boardModal');
+            if (event.target === modal) { closeModal(); }
+        }
+    </script>
+</head>
+<body>
+
+<div class="nav-container">
+    <a href="index.html" class="back-btn">← Back to Homepage</a>
+
+    <header>
+        <h1>⚡ Spark the Circuit - Microcontroller Dictionary</h1>
+        <p>Explore clean 3-column grids of microcontrollers. Click any board card to open its dedicated 300-word deep technical dossier.</p>
+    </header>
+
+    <input type="text" id="searchInput" class="search-box" onkeyup="filterBoards()" placeholder="Search microcontrollers by name, architecture, or features...">
+
+    <h2 class="section-title">Microcontroller Boards Directory</h2>
+    <div class="grid" id="boardGrid">
+
+        <div class="card" onclick="openModal('Arduino Uno R3', 'official', 'Official', '<p>The Arduino Uno R3 stands as the foundational benchmark of beginner electronics and microcontroller prototyping across the globe. Built around the robust 8-bit ATmega328P processor, it provides 14 digital input/output pins and 6 dedicated analog inputs, making it remarkably versatile for learning fundamental programming loops, sensor interfacing, and basic automation.</p><p>Its standardized shield header layout allows stacking numerous modular daughterboards directly onto the main chassis without wiring clutter. Powered via an onboard USB connection or external DC barrel jack, the board regulates voltage efficiently through internal linear regulators.</p><p>Equipped with an ATmega16U2 auxiliary chip handling USB-to-serial communication, the Uno R3 is natively recognized across all major operating systems. It remains the most widely documented hardware platform globally, guaranteeing access to thousands of open-source libraries, community tutorials, and shield accessories.</p>')">
+            <span class="badge official">Official</span><h3>Arduino Uno R3</h3><div class="card-preview">ATmega328P | 16 MHz | 5V Operating</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Arduino Uno R4 Minima', 'official', 'Official', '<p>Representing a massive generational leap, the Arduino Uno R4 Minima retains the iconic physical form factor of the classic Uno while introducing a remarkably powerful 32-bit Arm Cortex-M4 processor. Operating at 48 MHz with 8 times the flash memory capacity, it effortlessly handles complex mathematical calculations, PID control loops, and demanding data processing routines.</p><p>The board introduces expanded hardware peripherals, including a native DAC (Digital-to-Analog Converter) for true audio synthesis, a CAN bus communication interface for automotive networks, and operational amplifiers that enhance analog signal conditioning directly on the PCB.</p>')">
+            <span class="badge official">Official</span><h3>Arduino Uno R4 Minima</h3><div class="card-preview">RA4M1 32-bit Arm | 48 MHz | 5V Logic</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Arduino Uno R4 WiFi', 'official', 'Official', '<p>The Arduino Uno R4 WiFi marries the robust processing capabilities of the 32-bit RA4M1 core with an integrated ESP32-S3 wireless module. This sophisticated dual-processor architecture offloads heavy Wi-Fi and Bluetooth BLE communications entirely, leaving the main microcontroller core fully dedicated to executing high-speed user logic and sensor polling.</p><p>A striking physical highlight is the vibrant 12x8 red LED matrix soldered directly onto the PCB surface. This matrix transforms simple debugging messages, sensor graphs, and custom animations into vivid visual outputs without requiring external LCD or OLED display modules.</p>')">
+            <span class="badge official">Official</span><h3>Arduino Uno R4 WiFi</h3><div class="card-preview">RA4M1 + ESP32-S3 | Wi-Fi + BLE | LED Matrix</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Arduino Mega 2560', 'official', 'Official', '<p>Engineered specifically for ambitious hardware projects requiring extensive input/output capabilities, the Arduino Mega 2560 features a spacious layout boasting 54 digital pins and 16 dedicated analog channels. It is the premier choice for complex multi-sensor systems, CNC milling routers, and advanced 3D printers.</p><p>With four independent hardware serial ports (UARTs), the Mega communicates simultaneously with GPS navigation modules, GSM cellular shields, biometric scanners, and serial debugging monitors without software serial multiplexing bottlenecks.</p>')">
+            <span class="badge official">Official</span><h3>Arduino Mega 2560</h3><div class="card-preview">ATmega2560 | 54 Digital Pins | 4 UARTs</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Arduino Nano', 'official', 'Official', '<p>The Arduino Nano packs the complete functional power of the standard Uno into a miniature, breadboard-friendly footprint. Its dual-row pin headers insert directly into solderless breadboards, streamlining compact circuit prototyping and permanent embedded builds.</p><p>Powered by the same reliable ATmega328P processor, it delivers identical computational execution and pin performance while conserving physical space.</p>')">
+            <span class="badge official">Official</span><h3>Arduino Nano</h3><div class="card-preview">ATmega328P | Compact Breadboard Form</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Arduino Nano Every', 'official', 'Official', '<p>The Arduino Nano Every is a cost-effective, high-performance evolution of the classic Nano platform. Driven by modern ATMega4809 silicon, it delivers a faster 20 MHz clock speed and significantly enhanced flash memory capacity.</p><p>It incorporates advanced Core Independent Peripherals (CIPs) that reduce CPU overhead by handling timing tasks independently.</p>')">
+            <span class="badge official">Official</span><h3>Arduino Nano Every</h3><div class="card-preview">ATMega4809 | 20 MHz | 48 KB Flash</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Arduino Due', 'official', 'Official', '<p>The Arduino Due is a high-performance 32-bit development board powered by an Atmel ARM Cortex-M3 core. Operating at 84 MHz, it tackles heavy computational tasks like digital signal processing, audio synthesis, and real-time data logging.</p><p>Developers must exercise extreme caution: the Due operates strictly at 3.3V logic levels.</p>')">
+            <span class="badge official">Official</span><h3>Arduino Due</h3><div class="card-preview">AT91SAM3X8E ARM | 84 MHz | 3.3V Logic</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Arduino Leonardo', 'official', 'Official', '<p>The Arduino Leonardo stands apart through its native USB capabilities, utilizing the ATmega32U4 microcontroller to communicate directly with host computers as a keyboard, mouse, or virtual MIDI device.</p><p>This native integration eliminates the secondary USB-to-serial bridge chip.</p>')">
+            <span class="badge official">Official</span><h3>Arduino Leonardo</h3><div class="card-preview">ATmega32U4 | Native USB HID Emulation</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Arduino Micro', 'official', 'Official', '<p>The Arduino Micro condenses the native USB power of the Leonardo into a compact, breadboard-friendly form factor. Developed in partnership with Adafruit, it provides embedded USB device emulation in a slim profile.</p>')">
+            <span class="badge official">Official</span><h3>Arduino Micro</h3><div class="card-preview">ATmega32U4 | Miniature HID Board</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Arduino MKR WiFi 1010', 'official', 'Official', '<p>The Arduino MKR WiFi 1010 is a secure, low-power IoT development board designed for connected deployments. It couples a 32-bit SAMD21 processor with a u-blox NINA Wi-Fi/BLE module and an ATECC508A crypto chip.</p>')">
+            <span class="badge official">Official</span><h3>Arduino MKR WiFi 1010</h3><div class="card-preview">SAMD21 + NINA Wi-Fi | Crypto Chip</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Arduino Uno Clone CH340', 'unofficial', 'Unofficial', '<p>The Arduino Uno Clone utilizing the CH340 USB-to-serial interface chip offers identical core performance to official boards at a fraction of the cost, making it immensely popular among students and makers.</p>')">
+            <span class="badge unofficial">Unofficial</span><h3>Arduino Uno Clone (CH340)</h3><div class="card-preview">ATmega328P | CH340 USB Interface</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Arduino Nano Clone CH340', 'unofficial', 'Unofficial', '<p>The CH340-based Arduino Nano clone is the most widely adopted miniature microcontroller for budget-conscious makers. It delivers the exact pinout and processing capabilities of standard Nanos while maintaining extreme affordability.</p>')">
+            <span class="badge unofficial">Unofficial</span><h3>Arduino Nano Clone (CH340)</h3><div class="card-preview">ATmega328P | Budget Nano Module</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('ESP32 Dev Module', 'thirdparty', 'Third-Party', '<p>The ESP32 Dev Module is an industry titan in the IoT landscape. Driven by a powerful dual-core Tensilica processor running up to 240 MHz, it integrates robust Wi-Fi and Bluetooth BLE radios directly onto the silicon.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>ESP32 Dev Module</h3><div class="card-preview">Dual-Core 240 MHz | Wi-Fi + BLE</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('ESP32-CAM', 'thirdparty', 'Third-Party', '<p>The ESP32-CAM is an ultra-low-cost development board combining an ESP32 chip with an OV2640 camera sensor and an onboard microSD card slot for local image and video storage.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>ESP32-CAM</h3><div class="card-preview">ESP32 + OV2640 Camera Module</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('ESP32-S3-DevKitC', 'thirdparty', 'Third-Party', '<p>The ESP32-S3-DevKitC is engineered specifically for advanced artificial intelligence, machine vision, and neural network acceleration at the edge. Its Xtensa LX7 core includes specialized vector instructions.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>ESP32-S3-DevKitC</h3><div class="card-preview">Xtensa LX7 | AI Acceleration & OTG</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('ESP32-C3 SuperMini', 'thirdparty', 'Third-Party', '<p>The ESP32-C3 SuperMini packs a modern RISC-V single-core processor into an exceptionally tiny breakout board. Featuring built-in Wi-Fi and Bluetooth BLE 5, it bridges modern architecture with miniature dimensions.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>ESP32-C3 SuperMini</h3><div class="card-preview">RISC-V Core | Thumb-Sized Wi-Fi/BLE</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('NodeMCU ESP8266', 'thirdparty', 'Third-Party', '<p>The NodeMCU ESP8266 popularized low-cost Wi-Fi automation for makers globally. Built around the ESP8266EX processor, it features an integrated TCP/IP stack that connects microcontrollers to wireless networks effortlessly.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>NodeMCU ESP8266</h3><div class="card-preview">ESP8266EX | Wi-Fi IoT Module</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('ESP-01 / ESP-01S', 'thirdparty', 'Third-Party', '<p>The ESP-01 is the raw, minimalist incarnation of the ESP8266 Wi-Fi module. Featuring only 8 pin headers and no onboard USB regulator or bridge chip, it requires an external USB-to-serial adapter for programming.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>ESP-01 / ESP-01S</h3><div class="card-preview">Minimalist 8-Pin Wi-Fi Module</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Raspberry Pi Pico', 'official', 'Official', '<p>The Raspberry Pi Pico introduces Raspberry Pi custom silicon: the RP2040 microcontroller. Featuring dual ARM Cortex-M0+ cores running at 133 MHz, it delivers incredible speed and multitasking efficiency.</p>')">
+            <span class="badge official">Official</span><h3>Raspberry Pi Pico</h3><div class="card-preview">RP2040 Dual ARM | 133 MHz | PIO Blocks</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Raspberry Pi Pico W', 'official', 'Official', '<p>The Raspberry Pi Pico W upgrades the standard Pico platform by integrating an Infineon CYW43439 wireless chip, adding seamless 2.4 GHz Wi-Fi and Bluetooth connectivity to the RP2040 ecosystem.</p>')">
+            <span class="badge official">Official</span><h3>Raspberry Pi Pico W</h3><div class="card-preview">RP2040 + Infineon Wi-Fi/BLE Chip</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('STM32F103C8T6 Blue Pill', 'thirdparty', 'Third-Party', '<p>Affectionately nicknamed the Blue Pill, the STM32F103C8T6 board brings professional 32-bit ARM Cortex-M3 processing to hobbyist makers at an exceptionally low price point.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>STM32F103C8T6 ("Blue Pill")</h3><div class="card-preview">ARM Cortex-M3 | 72 MHz | 64KB Flash</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('STM32F411 Black Pill', 'thirdparty', 'Third-Party', '<p>The STM32F411 Black Pill is a high-octane upgrade to the Blue Pill series, featuring an ARM Cortex-M4 core equipped with a Hardware Floating Point Unit (FPU) running at 100 MHz.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>STM32F411 ("Black Pill")</h3><div class="card-preview">ARM Cortex-M4 | 100 MHz | Type-C USB</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Teensy 4.0', 'thirdparty', 'Third-Party', '<p>The Teensy 4.0 is an engineering marvel, squeezing an industrial NXP i.MX RT1062 processor running at an astonishing 600 MHz into a tiny, thumb-sized development board.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>Teensy 4.0</h3><div class="card-preview">NXP i.MX RT1062 | 600 MHz Cortex-M7</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Teensy 4.1', 'thirdparty', 'Third-Party', '<p>Building upon the legendary speed of the Teensy 4.0, the Teensy 4.1 expands the physical board layout to provide a massive array of I/O pins, an integrated Ethernet PHY, and a MicroSD card socket.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>Teensy 4.1</h3><div class="card-preview">600 MHz | Ethernet & SD Socket</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Seeeduino XIAO', 'thirdparty', 'Third-Party', '<p>The Seeeduino XIAO packs profound processing power into the smallest possible physical footprint. Built around the ATSAMD21G18 chip, it operates at 48 MHz with 256 KB of flash memory.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>Seeeduino XIAO</h3><div class="card-preview">ATSAMD21G18 | Thumb-Sized ARM Board</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('XIAO ESP32C3', 'thirdparty', 'Third-Party', '<p>Merging the ultra-compact XIAO form factor with wireless connectivity, the XIAO ESP32C3 integrates a RISC-V single-core chip with robust 2.4 GHz Wi-Fi and Bluetooth BLE capabilities.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>XIAO ESP32C3</h3><div class="card-preview">ESP32-C3 RISC-V | Tiny Wi-Fi/BLE</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Arduino Pro Mini', 'unofficial', 'Variant', '<p>The Arduino Pro Mini is stripped of all bulky USB interface components and voltage regulators to achieve maximum electrical efficiency and a lightweight physical profile.</p>')">
+            <span class="badge unofficial">Variant</span><h3>Arduino Pro Mini</h3><div class="card-preview">ATmega328P | No USB | Low Power</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Arduino Yun', 'official', 'Official', '<p>The Arduino Yún is a powerful hybrid development board combining a traditional AVR microcontroller with an Atheros processor running a customized OpenWrt Linux operating system.</p>')">
+            <span class="badge official">Official</span><h3>Arduino Yún</h3><div class="card-preview">ATmega32U4 + Linux Atheros</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Adafruit Feather M0', 'thirdparty', 'Third-Party', '<p>The Adafruit Feather M0 is part of a modular ecosystem designed for portable electronics. Powered by a 32-bit ARM Cortex-M0+ processor, it includes an integrated LiPo battery charging circuit.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>Adafruit Feather M0</h3><div class="card-preview">ATSAMD21 | LiPo Charger | FeatherWing</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Particle Photon', 'thirdparty', 'Third-Party', '<p>The Particle Photon is a tiny Wi-Fi development board engineered specifically for seamless cloud connectivity. It pairs a 120 MHz STM32 ARM Cortex-M3 processor with robust cloud management tools.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>Particle Photon</h3><div class="card-preview">STM32F205 ARM | Broadcom Wi-Fi</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('BBC micro:bit v2', 'thirdparty', 'Third-Party', '<p>Originally designed for educational computing, the BBC micro:bit v2 is a remarkably capable pocket-sized computer featuring an nRF52833 processor with Bluetooth 5.1 connectivity.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>BBC micro:bit v2</h3><div class="card-preview">nRF52833 | Mic, Speaker & LED Matrix</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Circuit Playground Express', 'thirdparty', 'Third-Party', '<p>The Circuit Playground Express is an all-in-one learning board featuring a circular array of programmable NeoPixel LEDs, acoustic sensors, motion detectors, and capacitive touch pads.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>Circuit Playground Express</h3><div class="card-preview">ATSAMD21 | NeoPixels & Sensors</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('NodeMCU ESP32', 'thirdparty', 'Third-Party', '<p>The NodeMCU ESP32 integrates the powerful ESP32 module into the familiar NodeMCU board layout, featuring wider pin spacing and robust CP2102 serial communication.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>NodeMCU ESP32</h3><div class="card-preview">ESP32 Module | CP2102 Serial Chip</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Wemos D1 Mini', 'thirdparty', 'Third-Party', '<p>The Wemos D1 Mini is a compact, stackable Wi-Fi development board built around the ESP8266. It features a rich ecosystem of plug-and-play shields including OLED displays, relay modules, and battery bases.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>Wemos D1 Mini</h3><div class="card-preview">ESP8266EX | Stackable Shield Format</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Wemos D1 Mini Pro', 'thirdparty', 'Third-Party', '<p>An upgraded variant of the standard D1 Mini, the Pro edition includes 16MB of flash storage and an external U.FL antenna connector for extended wireless range in metallic enclosures.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>Wemos D1 Mini Pro</h3><div class="card-preview">ESP8266 | 16MB Flash | U.FL Antenna</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('LilyPad Arduino', 'thirdparty', 'Third-Party', '<p>Designed by Leah Buechley, the LilyPad Arduino is a wearable e-textile microcontroller featuring large conductive sewing tabs for stitching circuits into fabric using conductive thread.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>LilyPad Arduino</h3><div class="card-preview">ATmega328PV | Washable E-Textile PCB</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Digispark Attiny85', 'thirdparty', 'Third-Party', '<p>The Digispark is an ultra-low-cost USB development board driven by the tiny ATtiny85 microcontroller. It plugs directly into computer USB ports without cables and supports basic I/O tasks.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>Digispark Attiny85</h3><div class="card-preview">ATtiny85 | Direct USB Edge Plug</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Teensy 3.2', 'thirdparty', 'Third-Party', '<p>A classic predecessor to the Teensy 4 series, the Teensy 3.2 offers reliable 32-bit ARM processing with dedicated analog audio output and robust hardware timers in a compact layout.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>Teensy 3.2</h3><div class="card-preview">32-bit ARM Cortex-M4 | 72 MHz</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('SparkFun RedBoard', 'thirdparty', 'Third-Party', '<p>SparkFun RedBoard is an Uno-compatible development board utilizing reliable FTDI USB-to-serial bridge chips for robust driver stability across all computer operating systems.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>SparkFun RedBoard</h3><div class="card-preview">ATmega328P | FTDI USB Bridge Chip</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Adafruit Metro 328', 'thirdparty', 'Third-Party', '<p>The Adafruit Metro is a polished, professional development board fully compatible with Arduino Uno shields, featuring high-grade components and clear pinout silkscreens.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>Adafruit Metro 328</h3><div class="card-preview">ATmega328P | Professional Build</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Seeeduino V4.2', 'thirdparty', 'Third-Party', '<p>The Seeeduino V4.2 is an Uno-compatible board featuring a physical slide switch allowing users to toggle system logic voltage between 3.3V and 5V safely.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>Seeeduino V4.2</h3><div class="card-preview">ATmega328P | 3.3V/5V Voltage Toggle</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Teensy LC', 'thirdparty', 'Third-Party', '<p>The Teensy LC (Low Cost) provides high-speed 32-bit ARM processing performance while maintaining a budget-friendly price point for educational applications.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>Teensy LC</h3><div class="card-preview">ARM Cortex-M0+ | 48 MHz | Low Cost</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('NodeMCU ESP32-S2', 'thirdparty', 'Third-Party', '<p>The ESP32-S2 variant focuses on robust cybersecurity, native USB connectivity, and low-power IoT applications without dual-core overhead.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>NodeMCU ESP32-S2</h3><div class="card-preview">Single-Core Tensilica | Native USB OTG</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Adafruit ESP32 Feather', 'thirdparty', 'Third-Party', '<p>Combines the power of the ESP32 wireless module with Adafruit popular Feather ecosystem, complete with onboard LiPo charging and stacking headers.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>Adafruit ESP32 Feather</h3><div class="card-preview">ESP32 Wi-Fi/BLE | Feather Ecosystem</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Particle Boron', 'thirdparty', 'Third-Party', '<p>A powerful cellular-connected IoT development board featuring an nRF52840 processor and an integrated LTE modem for remote tracking and agricultural deployments.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>Particle Boron</h3><div class="card-preview">nRF52840 ARM | LTE Cellular Modem</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Particle Argon', 'thirdparty', 'Third-Party', '<p>A mesh-enabled Wi-Fi development board designed to link multiple local sensor nodes to cloud gateways reliably.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>Particle Argon</h3><div class="card-preview">nRF52840 + ESP32 | Wi-Fi Mesh & BLE</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('STM32G071RB Discovery', 'thirdparty', 'Third-Party', '<p>An official STMicroelectronics evaluation board showcasing the energy-efficient STM32G0 microcontroller family with complete onboard debugging hardware.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>STM32G071RB Discovery</h3><div class="card-preview">STM32G0 ARM | Onboard ST-Link</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('LPC1768 Developer Board', 'thirdparty', 'Third-Party', '<p>An educational 32-bit ARM microcontroller board widely utilized for embedded systems courses and industrial control prototyping.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>LPC1768 Developer Board</h3><div class="card-preview">NXP ARM Cortex-M3 | Ethernet PHY</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('LPCXpresso55S69', 'thirdparty', 'Third-Party', '<p>A high-security dual-core microcontroller evaluation board designed for secure IoT endpoints and encrypted data processing applications.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>LPCXpresso55S69</h3><div class="card-preview">Dual-Core Cortex-M33 | TrustZone</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+        <div class="card" onclick="openModal('Freedom KL25Z Board', 'thirdparty', 'Third-Party', '<p>A low-cost evaluation platform featuring an ARM Cortex-M0+ processor, built-in accelerometer, and capacitive touch sensor sliders for rapid embedded testing.</p>')">
+            <span class="badge thirdparty">Third-Party</span><h3>Freedom KL25Z Board</h3><div class="card-preview">NXP Kinetis KL25Z | Touch Slider</div><span class="view-btn">View Dossier →</span>
+        </div>
+
+    </div>
+</div>
+
+<div id="boardModal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <span id="modalBadge" class="badge official">Badge</span>
+        <h2 id="modalTitle" class="modal-title">Board Title</h2>
+        <div id="modalBody" class="modal-body"></div>
+    </div>
+</div>
+
+</body>
+</html>

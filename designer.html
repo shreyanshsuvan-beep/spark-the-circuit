@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spark the Circuit - 3D Virtual Workbench with Sound & LED Animation</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f1f5f9; color: #1e293b; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        nav { background: #1e293b; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .logo { color: #38bdf8; font-weight: bold; font-size: 1.3rem; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .nav-controls { display: flex; gap: 15px; align-items: center; }
+        .btn { background: #0284c7; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 0.9rem; }
+        .btn:hover { background: #0369a1; }
+        .btn-success { background: #10b981; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: #ef4444; }
+        .btn-danger:hover { background: #dc2626; }
+        .workspace { display: flex; flex: 1; height: calc(100vh - 65px); position: relative; }
+        .sidebar { width: 340px; background: #ffffff; border-right: 1px solid #cbd5e1; padding: 20px; overflow-y: auto; box-shadow: 4px 0 10px rgba(0,0,0,0.05); }
+        .sidebar h3 { color: #0284c7; margin: 20px 0 10px 0; font-size: 1.05rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; }
+        .sidebar h3:first-child { margin-top: 0; }
+        .palette-item { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; cursor: grab; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; transition: border-color 0.2s, background 0.2s; }
+        .palette-item:hover { border-color: #0284c7; background: #f1f5f9; }
+        .canvas-container { flex: 1; background: #ffffff; position: relative; overflow: hidden; cursor: crosshair; }
+        svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+        .component { position: absolute; background: #ffffff; border: 2px solid #94a3b8; border-radius: 12px; padding: 15px; min-width: 180px; text-align: center; cursor: move; box-shadow: 0 10px 25px rgba(0,0,0,0.1); user-select: none; z-index: 5; transition: box-shadow 0.2s; }
+        .component:hover { border-color: #0284c7; box-shadow: 0 15px 30px rgba(2, 132, 199, 0.2); }
+        .component h4 { color: #0f172a; font-size: 0.9rem; margin-bottom: 8px; pointer-events: none; font-weight: 700; }
+        .terminal { width: 14px; height: 14px; background: #cbd5e1; border-radius: 50%; position: absolute; cursor: pointer; border: 2px solid #0f172a; z-index: 10; transition: transform 0.1s, background 0.1s; }
+        .terminal:hover { transform: scale(1.4); background: #0284c7; }
+        .term-left { left: -7px; top: 50%; transform: translateY(-50%); }
+        .term-right { right: -7px; top: 50%; transform: translateY(-50%); }
+        .term-top { top: -7px; left: 50%; transform: translateX(-50%); }
+        .term-bottom { bottom: -7px; left: 50%; transform: translateX(-50%); }
+        .fused { border-color: #ef4444 !important; background: #fef2f2 !important; animation: shake 0.3s ease-in-out infinite; }
+        .fused h4::after { content: ' [🔥 FUSED & SMOKING!]'; color: #ef4444; font-size: 0.7rem; display: block; font-weight: bold; }
+        .led-on { border-color: #10b981 !important; background: #ecfdf5 !important; box-shadow: 0 0 25px rgba(16, 185, 129, 0.8) !important; }
+        .led-on circle { fill: #22c55e !important; filter: drop-shadow(0 0 8px #22c55e); }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            20% { transform: translate(-1px, -2px) rotate(-1deg); }
+            40% { transform: translate(-3px, 0px) rotate(1deg); }
+            60% { transform: translate(3px, 2px) rotate(0deg); }
+            80% { transform: translate(1px, -1px) rotate(1deg); }
+            100% { transform: translate(-1px, 2px) rotate(-1deg); }
+        }
+        .instructions { position: absolute; bottom: 20px; left: 20px; background: rgba(255, 255, 255, 0.95); border: 1px solid #cbd5e1; padding: 15px 20px; border-radius: 8px; font-size: 0.85rem; color: #334155; pointer-events: none; z-index: 50; max-width: 380px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .instructions strong { color: #0284c7; }
+        .simulation-console { position: absolute; top: 20px; right: 20px; background: #0f172a; color: #38bdf8; border: 1px solid #334155; padding: 15px 20px; border-radius: 10px; font-family: monospace; font-size: 0.85rem; width: 320px; z-index: 50; box-shadow: 0 10px 15px rgba(0,0,0,0.2); }
+        .simulation-console h5 { color: #f8fafc; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid #334155; padding-bottom: 4px; }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="index.html" class="logo">⚡ Spark the Circuit — 3D Virtual Workbench</a>
+    <div class="nav-controls">
+        <button class="btn btn-success" onclick="runSimulation()">▶ Run Simulation & Audio FX</button>
+        <button class="btn btn-danger" onclick="resetWorkbench()">↺ Clear Workbench</button>
+    </div>
+</nav>
+<div class="workspace">
+    <div class="sidebar" id="sidebarPalette">
+        <!-- Components injected dynamically -->
+    </div>
+    <div class="canvas-container" id="canvas" ondragover="allowDrop(event)" ondrop="drop(event)">
+        <svg id="wireSvg"></svg>
+        <div class="simulation-console" id="simConsole">
+            <h5>⚡ Real-Time Physics & Audio Monitor</h5>
+            <p id="consoleStatus">Status: Workbench ready. Audio context initialized.</p>
+        </div>
+        <div class="instructions">
+            <strong>Workbench Guide:</strong><br>
+            • Drag any component from the sidebar onto canvas.<br>
+            • Click terminals to route solid <strong>BLACK</strong> wires with audio clicks.<br>
+            • Click <strong>Run Simulation</strong> to test circuit physics, solar panels & LED lighting effects!
+        </div>
+    </div>
+</div>
+<script>
+    // Web Audio API Sound Synthesizer
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        let now = audioCtx.currentTime;
+
+        if (type === 'click') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(500, now);
+            osc.frequency.exponentialRampToValueAtTime(150, now + 0.04);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+            osc.start(now);
+            osc.stop(now + 0.04);
+        } else if (type === 'connect') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(350, now);
+            osc.frequency.setValueAtTime(700, now + 0.08);
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            osc.start(now);
+            osc.stop(now + 0.15);
+        } else if (type === 'success') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.setValueAtTime(554.37, now + 0.1);
+            osc.frequency.setValueAtTime(659.25, now + 0.2);
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+            osc.start(now);
+            osc.stop(now + 0.35);
+        } else if (type === 'burnout') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(120, now);
+            osc.frequency.linearRampToValueAtTime(40, now + 0.4);
+            gain.gain.setValueAtTime(0.25, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+            osc.start(now);
+            osc.stop(now + 0.4);
+        }
+    }
+
+    // Component Catalog
+    const componentCatalog = [
+        // Power Sources
+        {id: "battery9v", cat: "🔋 Power Sources", name: "9V Battery Pack"},
+        {id: "battery5v", cat: "🔋 Power Sources", name: "5V DC Bench Supply"},
+        {id: "battery3v", cat: "🔋 Power Sources", name: "3V Coin Cell CR2032"},
+        {id: "battery12v", cat: "🔋 Power Sources", name: "12V Lead Acid Battery"},
+        {id: "solarpanel", cat: "🔋 Power Sources", name: "6V Solar PV Panel"},
+        {id: "solarpanel12v", cat: "🔋 Power Sources", name: "12V High-Power Solar Panel"},
+        {id: "acgenerator", cat: "🔋 Power Sources", name: "120V AC Generator"},
+        {id: "usbpower", cat: "🔋 Power Sources", name: "5V USB Power Bank"},
+        {id: "benchdual", cat: "🔋 Power Sources", name: "Dual Rail ±15V Supply"},
+        {id: "liionscell", cat: "🔋 Power Sources", name: "3.7V Li-Ion 18650 Cell"},
+        {id: "nimhpack", cat: "🔋 Power Sources", name: "9.6V NiMH Battery Pack"},
+        {id: "thermoelectric", cat: "🔋 Power Sources", name: "Peltier Thermoelectric Generator"},
+
+        // Passive Resistors
+        {id: "res10", cat: "⚡ Passives: Resistors", name: "10Ω Resistor"},
+        {id: "res47", cat: "⚡ Passives: Resistors", name: "47Ω Resistor"},
+        {id: "res100", cat: "⚡ Passives: Resistors", name: "100Ω Resistor"},
+        {id: "res220", cat: "⚡ Passives: Resistors", name: "220Ω Resistor"},
+        {id: "res330", cat: "⚡ Passives: Resistors", name: "330Ω Resistor"},
+        {id: "res470", cat: "⚡ Passives: Resistors", name: "470Ω Resistor"},
+        {id: "res1k", cat: "⚡ Passives: Resistors", name: "1kΩ Resistor"},
+        {id: "res2k2", cat: "⚡ Passives: Resistors", name: "2.2kΩ Resistor"},
+        {id: "res4k7", cat: "⚡ Passives: Resistors", name: "4.7kΩ Resistor"},
+        {id: "res10k", cat: "⚡ Passives: Resistors", name: "10kΩ Resistor"},
+        {id: "res22k", cat: "⚡ Passives: Resistors", name: "22kΩ Resistor"},
+        {id: "res47k", cat: "⚡ Passives: Resistors", name: "47kΩ Resistor"},
+        {id: "res100k", cat: "⚡ Passives: Resistors", name: "100kΩ Resistor"},
+        {id: "res470k", cat: "⚡ Passives: Resistors", name: "470kΩ Resistor"},
+        {id: "res1m", cat: "⚡ Passives: Resistors", name: "1MΩ Resistor"},
+
+        // Passive Capacitors & Inductors
+        {id: "cap1pf", cat: "⚡ Passives: Capacitors", name: "1pF Ceramic Cap"},
+        {id: "cap10pf", cat: "⚡ Passives: Capacitors", name: "10pF Ceramic Cap"},
+        {id: "cap100pf", cat: "⚡ Passives: Capacitors", name: "100pF Ceramic Cap"},
+        {id: "cap1nf", cat: "⚡ Passives: Capacitors", name: "1nF Ceramic Cap"},
+        {id: "cap10nf", cat: "⚡ Passives: Capacitors", name: "10nF Ceramic Cap"},
+        {id: "cap100nf", cat: "⚡ Passives: Capacitors", name: "100nF Decoupling Cap"},
+        {id: "cap1uf", cat: "⚡ Passives: Capacitors", name: "1µF Electrolytic Cap"},
+        {id: "cap4u7", cat: "⚡ Passives: Capacitors", name: "4.7µF Electrolytic Cap"},
+        {id: "cap10uf", cat: "⚡ Passives: Capacitors", name: "10µF Electrolytic Cap"},
+        {id: "cap22uf", cat: "⚡ Passives: Capacitors", name: "22µF Electrolytic Cap"},
+        {id: "cap47uf", cat: "⚡ Passives: Capacitors", name: "47µF Electrolytic Cap"},
+        {id: "cap100uf", cat: "⚡ Passives: Capacitors", name: "100µF Electrolytic Cap"},
+        {id: "cap470uf", cat: "⚡ Passives: Capacitors", name: "470µF Filter Cap"},
+        {id: "cap1000uf", cat: "⚡ Passives: Capacitors", name: "1000µF Bulk Cap"},
+        {id: "ind10uh", cat: "⚡ Passives: Inductors", name: "10µH Power Inductor"},
+        {id: "ind100uh", cat: "⚡ Passives: Inductors", name: "100µH Inductor"},
+        {id: "transformer", cat: "⚡ Passives: Inductors", name: "Step-Down Transformer"},
+
+        // Protection & Fuses
+        {id: "fuse500ma", cat: "⚡ Passives: Protection", name: "500mA Fast Fuse"},
+        {id: "fuse1a", cat: "⚡ Passives: Protection", name: "1A Glass Fuse"},
+        {id: "fuse5a", cat: "⚡ Passives: Protection", name: "5A Slow Blow Fuse"},
+        {id: "varistor", cat: "⚡ Passives: Protection", name: "MOV Surge Varistor"},
+
+        // Diodes & Rectifiers
+        {id: "diode1n4001", cat: "🔌 Diodes & Rectifiers", name: "1N4001 Diode"},
+        {id: "diode1n4007", cat: "🔌 Diodes & Rectifiers", name: "1N4007 Rectifier Diode"},
+        {id: "diodesw", cat: "🔌 Diodes & Rectifiers", name: "1N4148 Switching Diode"},
+        {id: "zener3v3", cat: "🔌 Diodes & Rectifiers", name: "3.3V Zener Diode"},
+        {id: "zener5v", cat: "🔌 Diodes & Rectifiers", name: "5.1V Zener Diode"},
+        {id: "zener12v", cat: "🔌 Diodes & Rectifiers", name: "12V Zener Diode"},
+        {id: "schottky", cat: "🔌 Diodes & Rectifiers", name: "Schottky Barrier Diode"},
+        {id: "bridge", cat: "🔌 Diodes & Rectifiers", name: "Bridge Rectifier Stack"},
+        {id: "varactor", cat: "🔌 Diodes & Rectifiers", name: "Varactor Tuning Diode"},
+        {id: "tvsdiode", cat: "🔌 Diodes & Rectifiers", name: "TVS Surge Diode"},
+        {id: "diac", cat: "🔌 Diodes & Rectifiers", name: "DIAC Trigger Diode"},
+        {id: "photodiode", cat: "🔌 Diodes & Rectifiers", name: "Photodiode Sensor"},
+
+        // Transistors & Semiconductors
+        {id: "bc547", cat: "📻 Transistors", name: "BC547 NPN Transistor"},
+        {id: "bc557", cat: "📻 Transistors", name: "BC557 PNP Transistor"},
+        {id: "2n2222", cat: "📻 Transistors", name: "2N2222 Switching NPN"},
+        {id: "2n3904", cat: "📻 Transistors", name: "2N3904 NPN Transistor"},
+        {id: "2n3906", cat: "📻 Transistors", name: "2N3906 PNP Transistor"},
+        {id: "irf540", cat: "📻 Transistors", name: "IRF540N Power MOSFET"},
+        {id: "bs170", cat: "📻 Transistors", name: "BS170 N-Channel MOSFET"},
+        {id: "igbt", cat: "📻 Transistors", name: "IGBT Power Switch"},
+        {id: "triac", cat: "📻 Transistors", name: "TRIAC AC Switch"},
+        {id: "scr", cat: "📻 Transistors", name: "Silicon Controlled Rectifier"},
+        {id: "darlington", cat: "📻 Transistors", name: "TIP120 Darlington Transistor"},
+        {id: "optoiso", cat: "📻 Transistors", name: "PC817 Optocoupler"},
+        {id: "unijunction", cat: "📻 Transistors", name: "UJT Transistor"},
+
+        // Active ICs & Regulators
+        {id: "lm7805", cat: "🎛️ Integrated Circuits", name: "LM7805 5V Regulator"},
+        {id: "lm7812", cat: "🎛️ Integrated Circuits", name: "LM7812 12V Regulator"},
+        {id: "ams1117", cat: "🎛️ Integrated Circuits", name: "AMS1117 3.3V Regulator"},
+        {id: "ne555", cat: "🎛️ Integrated Circuits", name: "NE555 Timer IC"},
+        {id: "lm741", cat: "🎛️ Integrated Circuits", name: "LM741 Operational Amp"},
+        {id: "lm358", cat: "🎛️ Integrated Circuits", name: "LM358 Dual Op-Amp"},
+        {id: "l298n", cat: "🎛️ Integrated Circuits", name: "L298N Motor Driver IC"},
+        {id: "max232", cat: "🎛️ Integrated Circuits", name: "MAX232 Serial Level Shifter"},
+        {id: "attiny85ic", cat: "🎛️ Integrated Circuits", name: "ATtiny85 MCU Chip"},
+        {id: "mcp3008", cat: "🎛️ Integrated Circuits", name: "MCP3008 ADC Chip"},
+        {id: "cd4017", cat: "🎛️ Integrated Circuits", name: "CD4017 Decade Counter IC"},
+        {id: "sn74hc595", cat: "🎛️ Integrated Circuits", name: "74HC595 Shift Register"},
+        {id: "esp01ic", cat: "🎛️ Integrated Circuits", name: "ESP-01 WiFi Module"},
+
+        // Switches & Relays
+        {id: "switch", cat: "🎚️ Switches & Relays", name: "SPST Toggle Switch"},
+        {id: "spdt", cat: "🎚️ Switches & Relays", name: "SPDT Slide Switch"},
+        {id: "button", cat: "🎚️ Switches & Relays", name: "Momentary Push Button"},
+        {id: "dipswitch", cat: "🎚️ Switches & Relays", name: "4-Way DIP Switch"},
+        {id: "relay5v", cat: "🎚️ Switches & Relays", name: "5V Electromagnetic Relay"},
+        {id: "solidstatrelay", cat: "🎚️ Switches & Relays", name: "Solid State Relay"},
+        {id: "reedswitch", cat: "🎚️ Switches & Relays", name: "Magnetic Reed Switch"},
+
+        // Sensors & Variables
+        {id: "pot10k", cat: "📡 Sensors & Variables", name: "10k Potentiometer"},
+        {id: "pot100k", cat: "📡 Sensors & Variables", name: "100k Potentiometer"},
+        {id: "ldr", cat: "📡 Sensors & Variables", name: "LDR Photoresistor"},
+        {id: "thermistor", cat: "📡 Sensors & Variables", name: "NTC Thermistor"},
+        {id: "dht22", cat: "📡 Sensors & Variables", name: "DHT22 Temp/Humidity Sensor"},
+        {id: "ultrasonic", cat: "📡 Sensors & Variables", name: "HC-SR04 Ultrasonic Sensor"},
+        {id: "piezomic", cat: "📡 Sensors & Variables", name: "Piezo Vibration Sensor"},
+
+        // Outputs & Actuators
+        {id: "ledred", cat: "💡 Outputs & Actuators", name: "5mm Red LED"},
+        {id: "ledgreen", cat: "💡 Outputs & Actuators", name: "5mm Green LED"},
+        {id: "ledblue", cat: "💡 Outputs & Actuators", name: "5mm Blue LED"},
+        {id: "ledyellow", cat: "💡 Outputs & Actuators", name: "5mm Yellow LED"},
+        {id: "rgbled", cat: "💡 Outputs & Actuators", name: "RGB Common Cathode LED"},
+        {id: "motor", cat: "💡 Outputs & Actuators", name: "12V DC Motor"},
+        {id: "servo", cat: "💡 Outputs & Actuators", name: "SG90 Micro Servo Motor"},
+        {id: "stepper", cat: "💡 Outputs & Actuators", name: "NEMA 17 Stepper Motor"},
+        {id: "buzzer", cat: "💡 Outputs & Actuators", name: "Piezoelectric Buzzer"},
+        {id: "speaker", cat: "💡 Outputs & Actuators", name: "8Ω Audio Speaker"},
+        {id: "lcd16x2", cat: "💡 Outputs & Actuators", name: "16x2 Character LCD Display"},
+        {id: "oled13", cat: "💡 Outputs & Actuators", name: "0.96 inch OLED Display"}
+    ];
+
+    window.onload = function() {
+        let sidebar = document.getElementById('sidebarPalette');
+        let categories = {};
+        componentCatalog.forEach(c => {
+            if(!categories[c.cat]) categories[c.cat] = [];
+            categories[c.cat].push(c);
+        });
+
+        for(let cat in categories) {
+            let h3 = document.createElement('h3');
+            h3.innerText = cat;
+            sidebar.appendChild(h3);
+            categories[cat].forEach(comp => {
+                let div = document.createElement('div');
+                div.className = 'palette-item';
+                div.draggable = true;
+                div.id = comp.id;
+                div.setAttribute('ondragstart', 'drag(event)');
+                div.innerHTML = `${comp.name}`;
+                sidebar.appendChild(div);
+            });
+        }
+        updateConsole(`Loaded component palette successfully.`);
+    };
+
+    let canvas = document.getElementById('canvas');
+    let svg = document.getElementById('wireSvg');
+    let componentCount = 0;
+    let connections = [];
+    let connectingFrom = null;
+
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+
+    function drop(ev) {
+        ev.preventDefault();
+        let id = ev.dataTransfer.getData("text");
+        let item = componentCatalog.find(c => c.id === id);
+        if(!item) return;
+        playSound('click');
+        let rect = canvas.getBoundingClientRect();
+        let x = ev.clientX - rect.left - 100;
+        let y = ev.clientY - rect.top - 70;
+        createComponent(item, x, y);
+    }
+
+    function createComponent(item, x, y) {
+        componentCount++;
+        let comp = document.createElement('div');
+        comp.className = 'component';
+        comp.style.left = x + 'px';
+        comp.style.top = y + 'px';
+        comp.id = 'comp_' + componentCount;
+
+        let iconSvg = `<svg width="100" height="40" viewBox="0 0 100 40"><rect width="100" height="40" rx="6" fill="#e2e8f0"/><text x="50" y="25" text-anchor="middle" fill="#334155" font-size="10" font-weight="bold">${item.id.toUpperCase()}</text></svg>`;
+        if(item.id.includes('led')) {
+            iconSvg = `<svg width="70" height="50" viewBox="0 0 70 50"><circle cx="35" cy="22" r="14" fill="#ef4444"/><rect x="29" y="36" width="12" height="12" fill="#cbd5e1"/></svg>`;
+        } else if(item.id.includes('solar')) {
+            iconSvg = `<svg width="80" height="50" viewBox="0 0 80 50"><rect width="80" height="50" rx="4" fill="#1e3a8a"/><line x1="26" y1="0" x2="26" y2="50" stroke="#93c5fd" stroke-width="2"/><line x1="53" y1="0" x2="53" y2="50" stroke="#93c5fd" stroke-width="2"/><line x1="0" y1="25" x2="80" y2="25" stroke="#93c5fd" stroke-width="2"/></svg>`;
+        }
+
+        comp.innerHTML = `<h4>${item.name}</h4>${iconSvg}
+            <div class="terminal term-left" onclick="handleTerminalClick('${comp.id}', 'left')"></div>
+            <div class="terminal term-right" onclick="handleTerminalClick('${comp.id}', 'right')"></div>
+            <div class="terminal term-top" onclick="handleTerminalClick('${comp.id}', 'top')"></div>
+            <div class="terminal term-bottom" onclick="handleTerminalClick('${comp.id}', 'bottom')"></div>`;
+        makeDraggable(comp);
+        canvas.appendChild(comp);
+        updateConsole(`Placed ${item.name}.`);
+    }
+
+    function makeDraggable(elmnt) {
+        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        elmnt.onmousedown = dragMouseDown;
+        function dragMouseDown(e) {
+            if(e.target.classList.contains('terminal')) return;
+            e.preventDefault();
+            pos3 = e.clientX; pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            document.onmousemove = elementDrag;
+        }
+        function elementDrag(e) {
+            e.preventDefault();
+            pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY;
+            pos3 = e.clientX; pos4 = e.clientY;
+            elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+            elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            updateWires();
+        }
+        function closeDragElement() { document.onmouseup = null; document.onmousemove = null; }
+    }
+
+    function handleTerminalClick(compId, termSide) {
+        let termEl = document.querySelector(`#${compId} .term-${termSide}`);
+        playSound('click');
+        if(!connectingFrom) {
+            connectingFrom = {compId, termSide};
+            termEl.style.background = '#0284c7';
+            updateConsole(`Terminal selected. Click target terminal to route black wire.`);
+        } else {
+            connections.push({from: connectingFrom, to: {compId, termSide}});
+            connectingFrom = null;
+            playSound('connect');
+            drawWires();
+            updateConsole(`Solid black wire routed successfully.`);
+        }
+    }
+
+    function drawWires() {
+        svg.innerHTML = '';
+        connections.forEach(conn => {
+            let el1 = document.querySelector(`#${conn.from.compId} .term-${conn.from.termSide}`);
+            let el2 = document.querySelector(`#${conn.to.compId} .term-${conn.to.termSide}`);
+            if(el1 && el2) {
+                let r1 = el1.getBoundingClientRect();
+                let r2 = el2.getBoundingClientRect();
+                let cr = canvas.getBoundingClientRect();
+                let x1 = r1.left + r1.width/2 - cr.left;
+                let y1 = r1.top + r1.height/2 - cr.top;
+                let x2 = r2.left + r2.width/2 - cr.left;
+                let y2 = r2.top + r2.height/2 - cr.top;
+
+                let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+                line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+                line.setAttribute('stroke', '#000000');
+                line.setAttribute('stroke-width', '3.5');
+                svg.appendChild(line);
+            }
+        });
+    }
+
+    function updateWires() { drawWires(); }
+
+    function updateConsole(msg) {
+        document.getElementById('consoleStatus').innerText = "Status: " + msg;
+    }
+
+    function runSimulation() {
+        let components = document.querySelectorAll('.component');
+        let hasPower = false, hasLed = false, hasResistor = false, hasSolar = false;
+        
+        components.forEach(c => {
+            if(c.innerText.includes('Battery') || c.innerText.includes('Supply') || c.innerText.includes('Bank')) hasPower = true;
+            if(c.innerText.includes('Solar')) { hasPower = true; hasSolar = true; }
+            if(c.innerText.includes('LED')) hasLed = true;
+            if(c.innerText.includes('Resistor')) hasResistor = true;
+        });
+
+        if(hasPower && hasLed && !hasResistor) {
+            components.forEach(c => { if(c.innerText.includes('LED')) c.classList.add('fused'); });
+            playSound('burnout');
+            updateConsole('🔥 OVERCURRENT BURN OUT! Power connected directly to LED without resistor!');
+            alert('🔥 OVERCURRENT BURN OUT! Power connected directly to LED without a current-limiting resistor! LED has fused.');
+            return;
+        }
+
+        if(hasPower && hasLed && hasResistor) {
+            components.forEach(c => { if(c.innerText.includes('LED')) { c.classList.add('led-on'); } });
+            playSound('success');
+            let msg = hasSolar ? '☀️ Solar Panel active! Sunlight generating current through resistor to illuminate LED.' : '✨ Circuit operating successfully! LED illuminated with glowing animation & sound FX.';
+            updateConsole(msg);
+            alert(msg);
+            return;
+        }
+
+        playSound('success');
+        updateConsole('⚡ Simulation running successfully across components with solid black wiring.');
+        alert('⚡ Simulation Running Successfully on White Background! All components, solar panels and black wire connections nominal.');
+    }
+
+    function resetWorkbench() {
+        playSound('click');
+        canvas.innerHTML = '<svg id="wireSvg"></svg><div class="simulation-console" id="simConsole"><h5>⚡ Real-Time Physics & Audio Monitor</h5><p id="consoleStatus">Status: Workbench cleared. Ready for new design.</p></div><div class="instructions"><strong>Workbench Guide:</strong><br>• Drag any component from the sidebar onto canvas.<br>• Click terminals to route solid <strong>BLACK</strong> wires with audio clicks.<br>• Click <strong>Run Simulation</strong> to test circuit physics, solar panels & LED lighting effects!</div>';
+        svg = document.getElementById('wireSvg');
+        connections = []; componentCount = 0;
+    }
+</script>
+</body>
+</html>

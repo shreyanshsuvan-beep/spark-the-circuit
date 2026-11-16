@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spark the Circuit - 50 Boards Comparison Matrix & Power Evaluator</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; padding: 30px; line-height: 1.6; }
+        .container { max-width: 1350px; margin: 0 auto; }
+        .back-btn { display: inline-block; margin-bottom: 20px; color: #38bdf8; text-decoration: none; font-weight: bold; }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { color: #38bdf8; font-size: 2.8rem; margin-bottom: 10px; }
+        p { color: #94a3b8; font-size: 1.1rem; }
+        .evaluator-card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 30px; margin-bottom: 40px; box-shadow: 0 10px 15px rgba(0,0,0,0.3); }
+        .evaluator-card h2 { color: #38bdf8; margin-bottom: 15px; font-size: 1.5rem; }
+        .eval-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 20px; align-items: flex-end; }
+        @media(max-width: 850px) { .eval-grid { grid-template-columns: 1fr; } }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #cbd5e1; font-size: 0.95rem; }
+        select { width: 100%; padding: 12px 15px; background: #162032; color: #fff; border: 1px solid #334155; border-radius: 8px; font-size: 1rem; outline: none; }
+        .winner-box { margin-top: 20px; padding: 15px 20px; background: #162032; border-left: 4px solid #10b981; border-radius: 8px; font-weight: bold; color: #38bdf8; font-size: 1.1rem; }
+        .table-container { background: #1e293b; border: 1px solid #334155; border-radius: 14px; overflow-x: auto; box-shadow: 0 10px 15px rgba(0,0,0,0.3); max-height: 550px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 14px 18px; border-bottom: 1px solid #334155; font-size: 0.9rem; }
+        th { background: #162032; color: #38bdf8; font-weight: 700; position: sticky; top: 0; z-index: 10; }
+        tr:hover { background: #26334d; }
+    </style>
+    <script>
+        const boardsData = [
+            {name: "Arduino Uno R3", cpu: "ATmega328P", mhz: 16, flash: "32 KB", ram: "2 KB", voltage: "5V", wireless: "None"},
+            {name: "Arduino Uno R4 Minima", cpu: "RA4M1 ARM", mhz: 48, flash: "256 KB", ram: "32 KB", voltage: "5V", wireless: "None"},
+            {name: "Arduino Uno R4 WiFi", cpu: "RA4M1 + ESP32", mhz: 240, flash: "256 KB", ram: "32 KB", voltage: "5V", wireless: "Wi-Fi + BLE"},
+            {name: "Arduino Mega 2560", cpu: "ATmega2560", mhz: 16, flash: "256 KB", ram: "8 KB", voltage: "5V", wireless: "None"},
+            {name: "Arduino Nano", cpu: "ATmega328P", mhz: 16, flash: "32 KB", ram: "2 KB", voltage: "5V", wireless: "None"},
+            {name: "Arduino Nano Every", cpu: "ATMega4809", mhz: 20, flash: "48 KB", ram: "6 KB", voltage: "5V", wireless: "None"},
+            {name: "Arduino Due", cpu: "AT91SAM3X8E", mhz: 84, flash: "512 KB", ram: "96 KB", voltage: "3.3V", wireless: "None"},
+            {name: "Arduino Leonardo", cpu: "ATmega32U4", mhz: 16, flash: "32 KB", ram: "2.5 KB", voltage: "5V", wireless: "None"},
+            {name: "Arduino Micro", cpu: "ATmega32U4", mhz: 16, flash: "32 KB", ram: "2.5 KB", voltage: "5V", wireless: "None"},
+            {name: "Arduino MKR WiFi 1010", cpu: "SAMD21", mhz: 48, flash: "256 KB", ram: "32 KB", voltage: "3.3V", wireless: "Wi-Fi + BLE"},
+            {name: "ESP32 Dev Module", cpu: "Tensilica Dual-Core", mhz: 240, flash: "4 MB", ram: "520 KB", voltage: "3.3V", wireless: "Wi-Fi + BLE"},
+            {name: "ESP32-CAM", cpu: "Tensilica Dual-Core", mhz: 240, flash: "4 MB", ram: "520 KB", voltage: "5V/3.3V", wireless: "Wi-Fi + BLE"},
+            {name: "ESP32-S3-DevKitC", cpu: "Xtensa LX7", mhz: 240, flash: "8 MB", ram: "512 KB", voltage: "3.3V", wireless: "Wi-Fi + BLE"},
+            {name: "ESP32-C3 SuperMini", cpu: "RISC-V Single", mhz: 160, flash: "4 MB", ram: "400 KB", voltage: "3.3V", wireless: "Wi-Fi + BLE"},
+            {name: "NodeMCU ESP8266", cpu: "ESP8266EX", mhz: 80, flash: "4 MB", ram: "80 KB", voltage: "3.3V", wireless: "Wi-Fi"},
+            {name: "Raspberry Pi Pico", cpu: "RP2040 Dual ARM", mhz: 133, flash: "2 MB", ram: "264 KB", voltage: "3.3V", wireless: "None"},
+            {name: "Raspberry Pi Pico W", cpu: "RP2040 + CYW43439", mhz: 133, flash: "2 MB", ram: "264 KB", voltage: "3.3V", wireless: "Wi-Fi"},
+            {name: "STM32F103C8T6 Blue Pill", cpu: "ARM Cortex-M3", mhz: 72, flash: "64 KB", ram: "20 KB", voltage: "3.3V", wireless: "None"},
+            {name: "STM32F411 Black Pill", cpu: "ARM Cortex-M4", mhz: 100, flash: "512 KB", ram: "128 KB", voltage: "3.3V", wireless: "None"},
+            {name: "Teensy 4.0", cpu: "NXP i.MX RT1062", mhz: 600, flash: "2 MB", ram: "1024 KB", voltage: "3.3V", wireless: "None"},
+            {name: "Teensy 4.1", cpu: "NXP i.MX RT1062", mhz: 600, flash: "8 MB", ram: "1024 KB", voltage: "3.3V", wireless: "Ethernet Option"},
+            {name: "Seeeduino XIAO", cpu: "ATSAMD21G18", mhz: 48, flash: "256 KB", ram: "32 KB", voltage: "3.3V", wireless: "None"},
+            {name: "XIAO ESP32C3", cpu: "ESP32-C3 RISC-V", mhz: 160, flash: "4 MB", ram: "400 KB", voltage: "3.3V", wireless: "Wi-Fi + BLE"},
+            {name: "Arduino Pro Mini", cpu: "ATmega328P", mhz: 16, flash: "32 KB", ram: "2 KB", voltage: "5V/3.3V", wireless: "None"},
+            {name: "Digispark Attiny85", cpu: "ATtiny85", mhz: 16, flash: "8 KB", ram: "0.5 KB", voltage: "5V", wireless: "None"},
+            {name: "Arduino Yun", cpu: "ATmega32U4 + Atheros", mhz: 16, flash: "32 KB", ram: "2.5 KB", voltage: "5V", wireless: "Wi-Fi"},
+            {name: "Adafruit Feather M0", cpu: "ATSAMD21", mhz: 48, flash: "256 KB", ram: "32 KB", voltage: "3.3V", wireless: "None"},
+            {name: "Particle Photon", cpu: "STM32F205", mhz: 120, flash: "1 MB", ram: "128 KB", voltage: "3.3V", wireless: "Wi-Fi"},
+            {name: "BBC micro:bit v2", cpu: "nRF52833", mhz: 64, flash: "512 KB", ram: "128 KB", voltage: "3.3V", wireless: "BLE"},
+            {name: "Circuit Playground Express", cpu: "ATSAMD21", mhz: 48, flash: "256 KB", ram: "32 KB", voltage: "3.3V", wireless: "None"},
+            {name: "NodeMCU ESP32", cpu: "ESP32 Module", mhz: 240, flash: "4 MB", ram: "520 KB", voltage: "3.3V", wireless: "Wi-Fi + BLE"},
+            {name: "Wemos D1 Mini", cpu: "ESP8266EX", mhz: 80, flash: "4 MB", ram: "80 KB", voltage: "3.3V", wireless: "Wi-Fi"},
+            {name: "Wemos D1 Mini Pro", cpu: "ESP8266", mhz: 80, flash: "16 MB", ram: "80 KB", voltage: "3.3V", wireless: "Wi-Fi"},
+            {name: "LilyPad Arduino", cpu: "ATmega328PV", mhz: 8, flash: "32 KB", ram: "2 KB", voltage: "3.3V", wireless: "None"},
+            {name: "Teensy 3.2", cpu: "ARM Cortex-M4", mhz: 72, flash: "256 KB", ram: "64 KB", voltage: "3.3V", wireless: "None"},
+            {name: "SparkFun RedBoard", cpu: "ATmega328P", mhz: 16, flash: "32 KB", ram: "2 KB", voltage: "5V", wireless: "None"},
+            {name: "Adafruit Metro 328", cpu: "ATmega328P", mhz: 16, flash: "32 KB", ram: "2 KB", voltage: "5V", wireless: "None"},
+            {name: "Seeeduino V4.2", cpu: "ATmega328P", mhz: 16, flash: "32 KB", ram: "2 KB", voltage: "3.3V/5V", wireless: "None"},
+            {name: "Teensy LC", cpu: "ARM Cortex-M0+", mhz: 48, flash: "62 KB", ram: "8 KB", voltage: "3.3V", wireless: "None"},
+            {name: "NodeMCU ESP32-S2", cpu: "Tensilica Single-Core", mhz: 240, flash: "4 MB", ram: "320 KB", voltage: "3.3V", wireless: "Wi-Fi"},
+            {name: "Adafruit ESP32 Feather", cpu: "ESP32", mhz: 240, flash: "4 MB", ram: "520 KB", voltage: "3.3V", wireless: "Wi-Fi + BLE"},
+            {name: "Particle Boron", cpu: "nRF52840", mhz: 64, flash: "1 MB", ram: "256 KB", voltage: "3.3V", wireless: "LTE / BLE"},
+            {name: "Particle Argon", cpu: "nRF52840 + ESP32", mhz: 64, flash: "1 MB", ram: "256 KB", voltage: "3.3V", wireless: "Wi-Fi + BLE"},
+            {name: "STM32G071RB Discovery", cpu: "STM32G0 ARM", mhz: 64, flash: "128 KB", ram: "36 KB", voltage: "3.3V", wireless: "None"},
+            {name: "LPC1768 Developer Board", cpu: "NXP Cortex-M3", mhz: 100, flash: "512 KB", ram: "64 KB", voltage: "3.3V", wireless: "Ethernet"},
+            {name: "LPCXpresso55S69", cpu: "Dual Cortex-M33", mhz: 150, flash: "640 KB", ram: "256 KB", voltage: "3.3V", wireless: "None"},
+            {name: "Freedom KL25Z Board", cpu: "NXP KL25Z", mhz: 48, flash: "128 KB", ram: "16 KB", voltage: "3.3V", wireless: "None"},
+            {name: "Arduino Nano Clone CH340", cpu: "ATmega328P", mhz: 16, flash: "32 KB", ram: "2 KB", voltage: "5V", wireless: "None"},
+            {name: "Arduino Uno Clone CH340", cpu: "ATmega328P", mhz: 16, flash: "32 KB", ram: "2 KB", voltage: "5V", wireless: "None"},
+            {name: "ESP-01 / ESP-01S", cpu: "ESP8266EX", mhz: 80, flash: "1 MB", ram: "80 KB", voltage: "3.3V", wireless: "Wi-Fi"}
+        ];
+
+        window.onload = function() {
+            let select1 = document.getElementById('board1Select');
+            let select2 = document.getElementById('board2Select');
+            let tbody = document.getElementById('matrixBody');
+            boardsData.forEach((b, idx) => {
+                let opt1 = document.createElement('option');
+                opt1.value = idx; opt1.innerText = b.name;
+                select1.appendChild(opt1);
+                let opt2 = document.createElement('option');
+                opt2.value = idx; opt2.innerText = b.name;
+                select2.appendChild(opt2);
+                let tr = document.createElement('tr');
+                tr.innerHTML = `<td><strong>${b.name}</strong></td><td>${b.cpu}</td><td>${b.mhz} MHz</td><td>${b.flash}</td><td>${b.ram}</td><td>${b.voltage}</td><td>${b.wireless}</td>`;
+                tbody.appendChild(tr);
+            });
+        };
+
+        function compareBoardsPower() {
+            let b1 = boardsData[document.getElementById('board1Select').value];
+            let b2 = boardsData[document.getElementById('board2Select').value];
+            document.getElementById('evalResult').innerText = b1.mhz >= b2.mhz ? `🏆 Winner: ${b1.name} (${b1.mhz} MHz)` : `🏆 Winner: ${b2.name} (${b2.mhz} MHz)`;
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <a href="index.html" class="back-btn">← Back to Homepage</a>
+    <header>
+        <h1>📊 50-Board Comparison Matrix & Power Evaluator</h1>
+        <p>Comprehensive side-by-side processing power evaluation across all 50 microcontrollers.</p>
+    </header>
+    <div class="evaluator-card">
+        <h2>⚡ Interactive Power Evaluator</h2>
+        <div class="eval-grid">
+            <div class="form-group"><label>Board A:</label><select id="board1Select"></select></div>
+            <div class="form-group"><label>Board B:</label><select id="board2Select"></select></div>
+            <div><button class="btn" onclick="compareBoardsPower()">Compare Power</button></div>
+        </div>
+        <div class="winner-box" id="evalResult">Select boards to evaluate performance...</div>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr><th>Name</th><th>CPU / Core</th><th>Clock Speed</th><th>Flash Memory</th><th>SRAM</th><th>Operating Voltage</th><th>Wireless</th></tr>
+            </thead>
+            <tbody id="matrixBody"></tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

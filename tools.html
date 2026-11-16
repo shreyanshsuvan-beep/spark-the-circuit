@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spark the Circuit - 15 Interactive Engineering Calculators</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1e293b; padding: 30px; line-height: 1.6; }
+        .nav-container { max-width: 1000px; margin: 0 auto; }
+        .back-btn { display: inline-block; margin-bottom: 20px; color: #0284c7; text-decoration: none; font-weight: bold; font-size: 1rem; }
+        .back-btn:hover { text-decoration: underline; }
+        
+        header { text-align: center; margin-bottom: 40px; }
+        h1 { color: #0f172a; margin-bottom: 10px; font-size: 2.8rem; }
+        header p { color: #475569; font-size: 1.15rem; }
+        
+        .tool-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 35px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .tool-card h2 { color: #0284c7; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; font-size: 1.4rem; }
+        
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; color: #334155; font-size: 0.95rem; }
+        input, select { width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: #fff; outline: none; }
+        input:focus, select:focus { border-color: #0284c7; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
+        
+        button { background-color: #0284c7; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 0.95rem; margin-top: 5px; }
+        button:hover { background-color: #0369a1; }
+        
+        .result-box { margin-top: 15px; padding: 12px 18px; background: #f1f5f9; border-radius: 8px; font-weight: bold; color: #0f172a; border-left: 4px solid #0284c7; font-size: 1.05rem; }
+    </style>
+    <script>
+        function calcOhm() {
+            let v = parseFloat(document.getElementById('v').value);
+            let i = parseFloat(document.getElementById('i').value);
+            let r = parseFloat(document.getElementById('r').value);
+            let box = document.getElementById('resOhm');
+            if(!isNaN(v)&&!isNaN(i)) box.innerHTML = `Resistance = ${(v/i).toFixed(2)} Ω | Power = ${(v*i).toFixed(2)} W`;
+            else if(!isNaN(v)&&!isNaN(r)) box.innerHTML = `Current = ${(v/r).toFixed(4)} A | Power = ${(v*v/r).toFixed(2)} W`;
+            else if(!isNaN(i)&&!isNaN(r)) box.innerHTML = `Voltage = ${(i*r).toFixed(2)} V | Power = ${(i*i*r).toFixed(2)} W`;
+            else box.innerHTML = "⚠️ Enter two known values.";
+        }
+        function calcLed() {
+            let vs = parseFloat(document.getElementById('lVs').value), vf = parseFloat(document.getElementById('lVf').value), ma = parseFloat(document.getElementById('lMa').value);
+            document.getElementById('resLed').innerHTML = (!isNaN(vs)&&!isNaN(vf)&&!isNaN(ma)) ? `Required Resistor = ${((vs - vf) / (ma / 1000)).toFixed(1)} Ω` : "⚠️ Fill all fields.";
+        }
+        function calcDiv() {
+            let vin = parseFloat(document.getElementById('dVin').value), r1 = parseFloat(document.getElementById('dR1').value), r2 = parseFloat(document.getElementById('dR2').value);
+            document.getElementById('resDiv').innerHTML = (!isNaN(vin)&&!isNaN(r1)&&!isNaN(r2)) ? `Vout = ${(vin * (r2 / (r1 + r2))).toFixed(2)} V` : "⚠️ Fill all fields.";
+        }
+        function calcRC() {
+            let r = parseFloat(document.getElementById('rcR').value), c = parseFloat(document.getElementById('rcC').value);
+            document.getElementById('resRC').innerHTML = (!isNaN(r)&&!isNaN(c)) ? `Cutoff Frequency (Fc) = ${(1 / (2 * Math.PI * r * (c * 1e-6))).toFixed(2)} Hz` : "⚠️ Fill all fields.";
+        }
+        function calcBat() {
+            let cap = parseFloat(document.getElementById('bCap').value), cur = parseFloat(document.getElementById('bCur').value);
+            document.getElementById('resBat').innerHTML = (!isNaN(cap)&&!isNaN(cur)) ? `Estimated Runtime = ${((cap / cur) * 0.7).toFixed(1)} Hours (with 30% safety factor)` : "⚠️ Fill all fields.";
+        }
+        function calcTrace() {
+            let i = parseFloat(document.getElementById('tI').value), t = parseFloat(document.getElementById('tT').value);
+            document.getElementById('resTrace').innerHTML = (!isNaN(i)&&!isNaN(t)) ? `Min Width = ${(0.048 * Math.pow(i, 0.725) / Math.pow(t, 0.425)).toFixed(2)} mm` : "⚠️ Fill all fields.";
+        }
+        function calcSmd() {
+            let code = document.getElementById('sCode').value.trim();
+            if(code.length === 3) {
+                let val = (parseInt(code.substring(0,2)) * Math.pow(10, parseInt(code[2]))).toLocaleString();
+                document.getElementById('resSmd').innerHTML = `Resistance = ${val} Ω`;
+            } else document.getElementById('resSmd').innerHTML = "⚠️ Enter a valid 3-digit SMD code.";
+        }
+        function calcInd() {
+            let f = parseFloat(document.getElementById('iF').value), l = parseFloat(document.getElementById('iL').value);
+            document.getElementById('resInd').innerHTML = (!isNaN(f)&&!isNaN(l)) ? `Reactance (XL) = ${(2 * Math.PI * f * (l * 1e-3)).toFixed(2)} Ω` : "⚠️ Fill all fields.";
+        }
+        function calcCap() {
+            let f = parseFloat(document.getElementById('cF').value), c = parseFloat(document.getElementById('cC').value);
+            document.getElementById('resCap').innerHTML = (!isNaN(f)&&!isNaN(c)) ? `Reactance (XC) = ${(1 / (2 * Math.PI * f * (c * 1e-6))).toFixed(2)} Ω` : "⚠️ Fill all fields.";
+        }
+        function calc555() {
+            let r1 = parseFloat(document.getElementById('r5R1').value), r2 = parseFloat(document.getElementById('r5R2').value), c = parseFloat(document.getElementById('r5C').value);
+            document.getElementById('res555').innerHTML = (!isNaN(r1)&&!isNaN(r2)&&!isNaN(c)) ? `Frequency = ${(1.44 / ((r1 + 2 * r2) * (c * 1e-6))).toFixed(2)} Hz` : "⚠️ Fill all fields.";
+        }
+        function calcBjt() {
+            let ic = parseFloat(document.getElementById('bIc').value), hfe = parseFloat(document.getElementById('bHfe').value), vin = parseFloat(document.getElementById('bVin').value);
+            document.getElementById('resBjt').innerHTML = (!isNaN(ic)&&!isNaN(hfe)&&!isNaN(vin)) ? `Base Resistor (Rb) = ${(((vin - 0.7) / ((ic / 1000) / hfe)) * 0.5).toFixed(0)} Ω (2x Saturation Factor)` : "⚠️ Fill all fields.";
+        }
+        function calcThermal() {
+            let tj = parseFloat(document.getElementById('tTj').value), ta = parseFloat(document.getElementById('tTa').value), p = parseFloat(document.getElementById('tP').value);
+            document.getElementById('resThermal').innerHTML = (!isNaN(tj)&&!isNaN(ta)&&!isNaN(p)) ? `Max Thermal Resistance = ${((tj - ta) / p).toFixed(2)} °C/W` : "⚠️ Fill all fields.";
+        }
+        function calcWire() {
+            let i = parseFloat(document.getElementById('wI').value), len = parseFloat(document.getElementById('wL').value), r = parseFloat(document.getElementById('wR').value);
+            document.getElementById('resWire').innerHTML = (!isNaN(i)&&!isNaN(len)&&!isNaN(r)) ? `Voltage Drop = ${(2 * len * (r/1000) * i).toFixed(2)} V` : "⚠️ Fill all fields.";
+        }
+        function calcRms() {
+            let v = parseFloat(document.getElementById('vPeak').value);
+            document.getElementById('resRms').innerHTML = (!isNaN(v)) ? `RMS Voltage = ${(v * 0.7071).toFixed(2)} V | Peak-to-Peak = ${(v * 2).toFixed(2)} V` : "⚠️ Fill value.";
+        }
+        function calcDb() {
+            let p1 = parseFloat(document.getElementById('p1').value), p2 = parseFloat(document.getElementById('p2').value);
+            document.getElementById('resDb').innerHTML = (!isNaN(p1)&&!isNaN(p2)) ? `Power Ratio = ${(10 * Math.log10(p2 / p1)).toFixed(2)} dB` : "⚠️ Fill all fields.";
+        }
+    </script>
+</head>
+<body>
+
+<div class="nav-container">
+    <a href="index.html" class="back-btn">← Back to Homepage</a>
+    <header>
+        <h1>🧮 15 Interactive Engineering Calculators</h1>
+        <p>Real-time calculation laboratory for electronic circuit parameters and embedded systems design.</p>
+    </header>
+
+    <div class="tool-card">
+        <h2>1. Ohm's Law & Power Calculator</h2>
+        <div class="form-group"><label>Voltage (V):</label><input type="number" id="v" placeholder="e.g. 5"></div>
+        <div class="form-group"><label>Current (A):</label><input type="number" id="i" placeholder="e.g. 0.02"></div>
+        <div class="form-group"><label>Resistance (Ω):</label><input type="number" id="r" placeholder="e.g. 220"></div>
+        <button onclick="calcOhm()">Calculate</button>
+        <div class="result-box" id="resOhm">Result will appear here...</div>
+    </div>
+
+    <div class="tool-card">
+        <h2>2. LED Current Limiting Resistor Calculator</h2>
+        <div class="form-group"><label>Supply Voltage (V):</label><input type="number" id="lVs" value="5"></div>
+        <div class="form-group"><label>LED Forward Voltage (V):</label><input type="number" id="lVf" value="2"></div>
+        <div class="form-group"><label>Desired Current (mA):</label><input type="number" id="lMa" value="20"></div>
+        <button onclick="calcLed()">Calculate Resistor</button>
+        <div class="result-box" id="resLed">Result will appear here...</div>
+    </div>
+
+    <div class="tool-card">
+        <h2>3. Voltage Divider Calculator</h2>
+        <div class="form-group"><label>Input Voltage (Vin):</label><input type="number" id="dVin" value="12"></div>
+        <div class="form-group"><label>Resistor R1 (Ω):</label><input type="number" id="dR1" value="10000"></div>
+        <div class="form-group"><label>Resistor R2 (Ω):</label><input type="number" id="dR2" value="10000"></div>
+        <button onclick="calcDiv()">Calculate Vout</button>
+        <div class="result-box" id="resDiv">Result will appear here...</div>
+    </div>
+
+    <div class="tool-card">
+        <h2>4. RC Low-Pass Filter Cutoff Frequency</h2>
+        <div class="form-group"><label>Resistance (Ω):</label><input type="number" id="rcR" value="1000"></div>
+        <div class="form-group"><label>Capacitance (µF):</label><input type="number" id="rcC" value="0.1"></div>
+        <button onclick="calcRC()">Calculate Cutoff Frequency</button>
+        <div class="result-box" id="resRC">Result will appear here...</div>
+    </div>
+
+    <div class="tool-card">
+        <h2>5. Battery Life Estimator</h2>
+        <div class="form-group"><label>Battery Capacity (mAh):</label><input type="number" id="bCap" value="2200"></div>
+        <div class="form-group"><label>Circuit Current Draw (mA):</label><input type="number" id="bCur" value="150"></div>
+        <button onclick="calcBat()">Estimate Runtime</button>
+        <div class="result-box" id="resBat">Result will appear here...</div>
+    </div>
+
+    <div class="tool-card">
+        <h2>6. PCB Trace Width Calculator</h2>
+        <div class="form-group"><label>Target Current (A):</label><input type="number" id="tI" value="2"></div>
+        <div class="form-group"><label>Copper Thickness (oz):</label><input type="number" id="tT" value="1"></div>
+        <button onclick="calcTrace()">Calculate Trace Width</button>
+        <div class="result-box" id="resTrace">Result will appear here...</div>
+    </div>
+
+    <div class="tool-card">
+        <h2>7. SMD Resistor Code Decoder</h2>
+        <div class="form-group"><label>3-Digit SMD Code (e.g. 103, 472):</label><input type="text" id="sCode" placeholder="103"></div>
+        <button onclick="calcSmd()">Decode Resistance</button>
+        <div class="result-box" id="resSmd">Result will appear here...</div>
+    </div>
+
+    <div class="tool-card">
+        <h2>8. Inductor Reactance Calculator</h2>
+        <div class="form-group"><label>Frequency (Hz):</label><input type="number" id="iF" value="1000"></div>
+        <div class="form-group"><label>Inductance (mH):</label><input type="number" id="iL" value="10"></div>
+        <button onclick="calcInd()">Calculate Reactance</button>
+        <div class="result-box" id="resInd">Result will appear here...</div>
+    </div>
+
+    <div class="tool-card">
+        <h2>9. Capacitor Reactance Calculator</h2>
+        <div class="form-group"><label>Frequency (Hz):</label><input type="number" id="cF" value="1000"></div>
+        <div class="form-group"><label>Capacitance (µF):</label><input type="number" id="cC" value="1"></div>
+        <button onclick="calcCap()">Calculate Reactance</button>
+        <div class="result-box" id="resCap">Result will appear here...</div>
+    </div>
+
+    <div class="tool-card">
+        <h2>10. 555 Timer Astable Frequency Calculator</h2>
+        <div class="form-group"><label>Resistor R1 (Ω):</label><input type="number" id="r5R1" value="10000"></div>
+        <div class="form-group"><label>Resistor R2 (Ω):</label><input type="number" id="r5R2" value="47000"></div>
+        <div class="form-group"><label>Capacitor C (µF):</label><input type="number" id="r5C" value="1"></div>
+        <button onclick="calc555()">Calculate Frequency</button>
+        <div class="result-box" id="res555">Result will appear here...</div>
+    </div>
+
+    <div class="tool-card">
+        <h2>11. BJT Transistor Base Resistor Calculator</h2>
+        <div class="form-group"><label>Collector Current Ic (mA):</label><input type="number" id="bIc" value="100"></div>
+        <div class="form-group"><label>Transistor Gain hFE:</label><input type="number" id="bHfe" value="100"></div>
+        <div class="form-group"><label>Input Drive Voltage (V):</label><input type="number" id="bVin" value="5"></div>
+        <button onclick="calcBjt()">Calculate Base Resistor</button>
+        <div class="result-box" id="resBjt">Result will appear here...</div>
+    </div>
+
+    <div class="tool-card">
+        <h2>12. Heat Sink Thermal Resistance Calculator</h2>
+        <div class="form-group"><label>Max Junction Temp (°C):</label><input type="number" id="tTj" value="125"></div>
+        <div class="form-group"><label>Ambient Temp (°C):</label><input type="number" id="tTa" value="25"></div>
+        <div class="form-group"><label>Power Dissipation (W):</label><input type="number" id="tP" value="5"></div>
+        <button onclick="calcThermal()">Calculate Thermal Resistance</button>
+        <div class="result-box" id="resThermal">Result will appear here...</div>
+    </div>
+
+    <div class="tool-card">
+        <h2>13. Wire Gauge Voltage Drop Calculator</h2>
+        <div class="form-group"><label>Current (A):</label><input type="number" id="wI" value="5"></div>
+        <div class="form-group"><label>Wire Length (Meters):</label><input type="number" id="wL" value="10"></div>
+        <div class="form-group"><label>Wire Resistance (mΩ/m):</label><input type="number" id="wR" value="13"></div>
+        <button onclick="calcWire()">Calculate Voltage Drop</button>
+        <div class="result-box" id="resWire">Result will appear here...</div>
+    </div>
+
+    <div class="tool-card">
+        <h2>14. AC Peak to RMS Voltage Converter</h2>
+        <div class="form-group"><label>Peak Voltage (Vpeak):</label><input type="number" id="vPeak" value="12"></div>
+        <button onclick="calcRms()">Convert Voltage</button>
+        <div class="result-box" id="resRms">Result will appear here...</div>
+    </div>
+
+    <div class="tool-card">
+        <h2>15. Decibel (dB) Power Ratio Calculator</h2>
+        <div class="form-group"><label>Input Power P1 (Watts):</label><input type="number" id="p1" value="1"></div>
+        <div class="form-group"><label>Output Power P2 (Watts):</label><input type="number" id="p2" value="10"></div>
+        <button onclick="calcDb()">Calculate Power Gain in dB</button>
+        <div class="result-box" id="resDb">Result will appear here...</div>
+    </div>
+</div>
+
+</body>
+</html>

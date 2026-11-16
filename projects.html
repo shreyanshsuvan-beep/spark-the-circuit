@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spark the Circuit - Hardware Projects Hub</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; padding: 30px; line-height: 1.6; }
+        .container { max-width: 1150px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { color: #38bdf8; margin-bottom: 10px; font-size: 2.8rem; }
+        p { color: #94a3b8; font-size: 1.15rem; }
+        .back-btn { display: inline-block; margin-bottom: 20px; color: #38bdf8; text-decoration: none; font-weight: bold; font-size: 1rem; }
+        .back-btn:hover { text-decoration: underline; }
+        
+        .toggle-bar { display: flex; justify-content: center; gap: 20px; margin-bottom: 40px; }
+        .tab-btn { background-color: #1e293b; color: #cbd5e1; border: 2px solid #334155; padding: 12px 30px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .tab-btn.active { background-color: #0284c7; color: white; border-color: #38bdf8; }
+
+        .project-section { display: none; }
+        .project-section.active { display: block; }
+
+        .project-card { background-color: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 35px; margin-bottom: 30px; box-shadow: 0 10px 15px rgba(0,0,0,0.3); }
+        .project-card h2 { color: #38bdf8; margin-bottom: 12px; border-bottom: 2px solid #334155; padding-bottom: 8px; font-size: 1.5rem; }
+        .project-card h3 { color: #f1f5f9; margin-top: 15px; margin-bottom: 6px; font-size: 1.15rem; }
+        
+        ul, ol { margin-left: 20px; color: #cbd5e1; margin-bottom: 12px; }
+        li { margin-bottom: 6px; }
+        
+        pre { background-color: #0b0f19; color: #38bdf8; padding: 15px; border-radius: 8px; overflow-x: auto; font-family: 'Courier New', Courier, monospace; font-size: 0.88rem; margin-top: 8px; border: 1px solid #334155; }
+    </style>
+    <script>
+        function switchTab(tabName) {
+            document.getElementById('codedSection').classList.remove('active');
+            document.getElementById('nonCodedSection').classList.remove('active');
+            document.getElementById('btnCoded').classList.remove('active');
+            document.getElementById('btnNonCoded').classList.remove('active');
+
+            if (tabName === 'coded') {
+                document.getElementById('codedSection').classList.add('active');
+                document.getElementById('btnCoded').classList.add('active');
+            } else {
+                document.getElementById('nonCodedSection').classList.add('active');
+                document.getElementById('btnNonCoded').classList.add('active');
+            }
+        }
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" class="back-btn">← Back to Homepage</a>
+
+    <header>
+        <h1>🛠️ Hardware Projects Hub</h1>
+        <p>Complete step-by-step projects with full component lists, wiring directions, assembly instructions, and code snippets.</p>
+    </header>
+
+    <div class="toggle-bar">
+        <button id="btnCoded" class="tab-btn active" onclick="switchTab('coded')">⚡ 10 Projects With Coding</button>
+        <button id="btnNonCoded" class="tab-btn" onclick="switchTab('nonCoded')">🔌 10 Projects Without Coding</button>
+    </div>
+
+    <!-- 10 CODED PROJECTS -->
+    <div id="codedSection" class="project-section active">
+        
+        <div class="project-card">
+            <h2>1. Obstacle Avoiding Smart Robot</h2>
+            <p>An autonomous robot chassis that sweeps an ultrasonic distance sensor using a servo motor to detect obstacles and steer away using DC gear motors.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x Arduino Uno R3</li><li>1x L298N Motor Driver Module</li><li>1x HC-SR04 Ultrasonic Sensor</li><li>1x SG90 Servo Motor</li><li>1x 2WD Robot Smart Chassis with DC Motors</li><li>2x 18650 Li-ion Batteries & Holder</li></ul>
+            <h3>🔌 Wiring Instructions:</h3>
+            <ul><li>HC-SR04 Trig Pin to Arduino Digital Pin 9, Echo Pin to Digital Pin 8, VCC to 5V, GND to GND.</li><li>L298N Motor Driver Inputs: IN1 to Pin 4, IN2 to Pin 5, IN3 to Pin 6, IN4 to Pin 7.</li><li>SG90 Servo Control Signal to Pin 10, VCC to 5V, GND to GND.</li></ul>
+            <h3>📋 Step-by-Step Procedure:</h3>
+            <ol><li>Assemble the 2WD robot chassis and mount the DC motors and wheels.</li><li>Mount the L298N motor driver, Arduino board, and battery holder to the top chassis.</li><li>Attach the SG90 servo motor to the front chassis and mount the HC-SR04 sensor on top of the servo horn.</li><li>Connect all signal wires according to the wiring list and upload the code.</li></ol>
+            <h3>💻 Complete Source Code:</h3>
+            <pre>#include &lt;Servo.h&gt;
+Servo headServo;
+const int trigPin = 9;
+const int echoPin = 8;
+
+void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(4, OUTPUT); pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT); pinMode(7, OUTPUT);
+  headServo.attach(10);
+  headServo.write(90);
+}
+
+long getDistance() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  long duration = pulseIn(echoPin, HIGH);
+  return duration * 0.034 / 2;
+}
+
+void loop() {
+  long dist = getDistance();
+  if (dist &gt; 20) {
+    digitalWrite(4, HIGH); digitalWrite(5, LOW);
+    digitalWrite(6, HIGH); digitalWrite(7, LOW);
+  } else {
+    digitalWrite(4, LOW); digitalWrite(5, LOW);
+    digitalWrite(6, LOW); digitalWrite(7, LOW);
+    delay(300);
+    digitalWrite(4, LOW); digitalWrite(5, HIGH);
+    digitalWrite(6, LOW); digitalWrite(7, HIGH);
+    delay(500);
+  }
+}</pre>
+        </div>
+
+        <div class="project-card">
+            <h2>2. Automated Smart Irrigation System</h2>
+            <p>Monitors soil moisture level using a resistive sensor probe and automatically activates a mini water pump through a relay when the soil becomes dry.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x Arduino Nano or Uno</li><li>1x Soil Moisture Sensor Probe & Module</li><li>1x 5V Single Channel Relay Module</li><li>1x 3-6V Mini Submersible Water Pump & Tubing</li><li>1x 5V Power Supply / Battery Pack</li></ul>
+            <h3>🔌 Wiring Instructions:</h3>
+            <ul><li>Soil Moisture Analog Output (AO) to Arduino Pin A0, VCC to 5V, GND to GND.</li><li>Relay Module IN Pin to Arduino Digital Pin 7, VCC to 5V, GND to GND.</li><li>Water pump power connected in series through the Relay Normally Open (NO) and Common (COM) contacts.</li></ul>
+            <h3>📋 Step-by-Step Procedure:</h3>
+            <ol><li>Insert the soil moisture sensor prongs into a pot filled with soil.</li><li>Connect the water pump tubing to a water container and direct the output tube to the plant root.</li><li>Wire the relay module between the external pump power supply and the pump terminals.</li><li>Upload the Arduino sketch and calibrate dryness thresholds in code.</li></ol>
+            <h3>💻 Complete Source Code:</h3>
+            <pre>const int sensorPin = A0;
+const int relayPin = 7;
+int threshold = 500;
+
+void setup() {
+  pinMode(relayPin, OUTPUT);
+  digitalWrite(relayPin, HIGH);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int sensorValue = analogRead(sensorPin);
+  Serial.print("Soil Moisture Level: ");
+  Serial.println(sensorValue);
+  
+  if (sensorValue &gt; threshold) {
+    digitalWrite(relayPin, LOW); // Pump ON
+  } else {
+    digitalWrite(relayPin, HIGH); // Pump OFF
+  }
+  delay(2000);
+}</pre>
+        </div>
+
+        <div class="project-card">
+            <h2>3. Bluetooth Home Automation Controller</h2>
+            <p>Allows users to toggle household electrical loads wirelessly using a mobile phone via an HC-05 Bluetooth transceiver module.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x Arduino Uno</li><li>1x HC-05 Bluetooth Module</li><li>1x 4-Channel 5V Relay Module</li><li>Connecting Jumper Wires</li></ul>
+            <h3>🔌 Wiring Instructions:</h3>
+            <ul><li>HC-05 TX to Arduino RX (Pin 0), HC-05 RX to Arduino TX (Pin 1 through a voltage divider), VCC to 5V, GND to GND.</li><li>Relay Module IN1, IN2, IN3, IN4 to Arduino Pins 2, 3, 4, 5.</li></ul>
+            <h3>📋 Step-by-Step Procedure:</h3>
+            <ol><li>Disconnect TX/RX lines while uploading code to avoid serial port conflict.</li><li>Pair smartphone with HC-05 Bluetooth module (default PIN: 1234 or 0000).</li><li>Use a Bluetooth terminal app to send serial commands '1', '2', '3', '4' to switch relays.</li></ol>
+            <h3>💻 Complete Source Code:</h3>
+            <pre>char state = 0;
+
+void setup() {
+  Serial.begin(9600);
+  for(int i = 2; i &lt;= 5; i++) {
+    pinMode(i, OUTPUT);
+    digitalWrite(i, HIGH);
+  }
+}
+
+void loop() {
+  if (Serial.available() &gt; 0) {
+    state = Serial.read();
+    if (state == '1') digitalWrite(2, !digitalRead(2));
+    if (state == '2') digitalWrite(3, !digitalRead(3));
+    if (state == '3') digitalWrite(4, !digitalRead(4));
+    if (state == '4') digitalWrite(5, !digitalRead(5));
+  }
+}</pre>
+        </div>
+
+        <div class="project-card">
+            <h2>4. IoT Weather Station (ESP32)</h2>
+            <p>Reads temperature and humidity readings from a DHT11 sensor and prints environmental telemetry data over the serial monitor and local network.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x ESP32 Development Board</li><li>1x DHT11 Temperature & Humidity Sensor</li><li>1x 10k Ohm Resistor</li><li>Breadboard & Jumper Wires</li></ul>
+            <h3>🔌 Wiring Instructions:</h3>
+            <ul><li>DHT11 VCC to 3.3V on ESP32, GND to GND.</li><li>DHT11 Data Pin to ESP32 GPIO 4 with a 10k resistor pull-up to 3.3V.</li></ul>
+            <h3>📋 Step-by-Step Procedure:</h3>
+            <ol><li>Install DHT sensor library in Arduino IDE.</li><li>Connect ESP32 via Micro-USB cable.</li><li>Compile and upload sketch; open Serial Monitor at 115200 baud to view real-time data logs.</li></ol>
+            <h3>💻 Complete Source Code:</h3>
+            <pre>#include "DHT.h"
+#define DHTPIN 4
+#define DHTTYPE DHT11
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(115200);
+  dht.begin();
+}
+
+void loop() {
+  delay(2000);
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
+  
+  if (isnan(h) || isnan(t)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+  
+  Serial.print("Humidity: "); Serial.print(h); Serial.print("% ");
+  Serial.print("Temperature: "); Serial.print(t); Serial.println("°C");
+}</pre>
+        </div>
+
+        <div class="project-card">
+            <h2>5. Smart Line Follower Robot</h2>
+            <p>A mobile robot that uses two reflective optical IR sensors to stay aligned on a black electrical tape line.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x Arduino Nano</li><li>2x IR Reflective Line Sensors</li><li>1x L298N Motor Driver</li><li>1x Robot Chassis with 2 DC Motors</li></ul>
+            <h3>🔌 Wiring Instructions:</h3>
+            <ul><li>Left IR Sensor OUT to Pin A0, Right IR Sensor OUT to Pin A1.</li><li>Motor Driver IN1 to Pin 5, IN2 to Pin 6, IN3 to Pin 9, IN4 to Pin 10.</li></ul>
+            <h3>📋 Step-by-Step Procedure:</h3>
+            <ol><li>Mount IR sensors underneath the front bumper facing down (1-2 cm above surface).</li><li>Create a track on a white poster board using black insulation tape.</li><li>Adjust sensitivity trimpots on IR modules until black tape is reliably detected.</li></ol>
+            <h3>💻 Complete Source Code:</h3>
+            <pre>const int leftIR = A0;
+const int rightIR = A1;
+
+void setup() {
+  pinMode(leftIR, INPUT);
+  pinMode(rightIR, INPUT);
+  for(int i = 5; i &lt;= 10; i++) pinMode(i, OUTPUT);
+}
+
+void loop() {
+  int leftVal = digitalRead(leftIR);
+  int rightVal = digitalRead(rightIR);
+
+  if (leftVal == LOW &amp;&amp; rightVal == LOW) { // Forward
+    digitalWrite(5, HIGH); digitalWrite(6, LOW);
+    digitalWrite(9, HIGH); digitalWrite(10, LOW);
+  } else if (leftVal == HIGH &amp;&amp; rightVal == LOW) { // Turn Left
+    digitalWrite(5, LOW); digitalWrite(6, LOW);
+    digitalWrite(9, HIGH); digitalWrite(10, LOW);
+  } else if (leftVal == LOW &amp;&amp; rightVal == HIGH) { // Turn Right
+    digitalWrite(5, HIGH); digitalWrite(6, LOW);
+    digitalWrite(9, LOW); digitalWrite(10, LOW);
+  } else { // Stop
+    digitalWrite(5, LOW); digitalWrite(6, LOW);
+    digitalWrite(9, LOW); digitalWrite(10, LOW);
+  }
+}</pre>
+        </div>
+
+        <div class="project-card">
+            <h2>6. RFID Access Control Lock</h2>
+            <p>Scans RFID cards and keyfobs using an RC522 reader to unlock an electronic solenoid door latch upon valid authorization.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x Arduino Uno</li><li>1x MFRC522 RFID Module</li><li>1x 5V Relay Module & 12V Solenoid Lock</li><li>1x Green LED, 1x Red LED, 2x 220Ω Resistors</li></ul>
+            <h3>🔌 Wiring Instructions:</h3>
+            <ul><li>RC522 SPI: SDA to Pin 10, SCK to Pin 13, MOSI to Pin 11, MISO to Pin 12, RST to Pin 9, 3.3V to 3.3V.</li><li>Relay IN to Pin 7, Green LED to Pin 4, Red LED to Pin 5.</li></ul>
+            <h3>📋 Step-by-Step Procedure:</h3>
+            <ol><li>Wire the SPI pins of the RC522 module to the Arduino board.</li><li>Upload the code and open the Serial Monitor to capture your master RFID card UID code.</li><li>Replace the master UID string in the code with your card code and re-upload.</li></ol>
+            <h3>💻 Complete Source Code:</h3>
+            <pre>#include &lt;SPI.h&gt;
+#include &lt;MFRC522.h&gt;
+
+#define SS_PIN 10
+#define RST_PIN 9
+MFRC522 rfid(SS_PIN, RST_PIN);
+
+void setup() {
+  Serial.begin(9600);
+  SPI.begin();
+  rfid.PCD_Init();
+  pinMode(7, OUTPUT); digitalWrite(7, HIGH);
+  pinMode(4, OUTPUT); pinMode(5, OUTPUT);
+}
+
+void loop() {
+  if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial()) return;
+  
+  digitalWrite(4, HIGH);
+  digitalWrite(7, LOW); // Unlock
+  delay(3000);
+  digitalWrite(7, HIGH); // Lock
+  digitalWrite(4, LOW);
+  rfid.PICC_HaltA();
+}</pre>
+        </div>
+
+        <div class="project-card">
+            <h2>7. Flame Detection Safety Alarm</h2>
+            <p>Uses an optical flame sensor to detect open fires and triggers a high-pitched buzzer alarm and red alert LED.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x Arduino Uno or Nano</li><li>1x IR Flame Sensor Module</li><li>1x Active Buzzer</li><li>1x Red LED & 220Ω Resistor</li></ul>
+            <h3>🔌 Wiring Instructions:</h3>
+            <ul><li>Flame Sensor DO (Digital Output) to Pin 2, VCC to 5V, GND to GND.</li><li>Buzzer Positive to Pin 8, Negative to GND.</li><li>Red LED Anode through 220Ω resistor to Pin 13, Cathode to GND.</li></ul>
+            <h3>📋 Step-by-Step Procedure:</h3>
+            <ol><li>Connect the flame sensor digital output to Arduino interrupt Pin 2.</li><li>Test sensor response using a flame source or lighter at a safe distance.</li><li>Adjust sensor onboard potentiometer sensitivity until ambient light is ignored.</li></ol>
+            <h3>💻 Complete Source Code:</h3>
+            <pre>const int flamePin = 2;
+const int buzzerPin = 8;
+const int ledPin = 13;
+
+void setup() {
+  pinMode(flamePin, INPUT);
+  pinMode(buzzerPin, OUTPUT);
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+  int flameDetected = digitalRead(flamePin);
+  
+  if (flameDetected == LOW) { // Flame active
+    digitalWrite(buzzerPin, HIGH);
+    digitalWrite(ledPin, HIGH);
+  } else {
+    digitalWrite(buzzerPin, LOW);
+    digitalWrite(ledPin, LOW);
+  }
+}</pre>
+        </div>
+
+        <div class="project-card">
+            <h2>8. Digital Ultrasonic Distance Measurement Tape</h2>
+            <p>Measures distance in centimeters using an HC-SR04 sensor and displays results live on an I2C 16x2 LCD display.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x Arduino Uno</li><li>1x HC-SR04 Ultrasonic Sensor</li><li>1x 16x2 LCD with I2C Backpack</li><li>Jumper Wires</li></ul>
+            <h3>🔌 Wiring Instructions:</h3>
+            <ul><li>HC-SR04 Trig to Pin 9, Echo to Pin 8, VCC to 5V, GND to GND.</li><li>I2C LCD SDA to Pin A4, SCL to Pin A5, VCC to 5V, GND to GND.</li></ul>
+            <h3>📋 Step-by-Step Procedure:</h3>
+            <ol><li>Attach the I2C module directly to the 16x2 LCD header.</li><li>Connect SDA and SCL to Arduino analog pins A4 and A5.</li><li>Upload the code to view live distance readouts updated every 250 milliseconds.</li></ol>
+            <h3>💻 Complete Source Code:</h3>
+            <pre>#include &lt;Wire.h&gt;
+#include &lt;LiquidCrystal_I2C.h&gt;
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+const int trigPin = 9;
+const int echoPin = 8;
+
+void setup() {
+  lcd.init(); lcd.backlight();
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+}
+
+void loop() {
+  digitalWrite(trigPin, LOW); delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH); delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  long duration = pulseIn(echoPin, HIGH);
+  int distance = duration * 0.034 / 2;
+  
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Distance Meas:");
+  lcd.setCursor(0, 1);
+  lcd.print(distance); lcd.print(" cm");
+  delay(250);
+}</pre>
+        </div>
+
+        <div class="project-card">
+            <h2>9. Dual-Axis Solar Tracker System</h2>
+            <p>Uses four LDR light sensors and two servo motors to continuously point a solar panel towards the brightest light source.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x Arduino Uno</li><li>4x LDR Light Sensors & 4x 10kΩ Resistors</li><li>2x SG90 Servo Motors</li><li>1x Solar Panel Model Frame</li></ul>
+            <h3>🔌 Wiring Instructions:</h3>
+            <ul><li>LDR Dividers to Pins A0 (Top-Left), A1 (Top-Right), A2 (Bottom-Left), A3 (Bottom-Right).</li><li>Horizontal Servo Signal to Pin 9, Vertical Servo Signal to Pin 10.</li></ul>
+            <h3>📋 Step-by-Step Procedure:</h3>
+            <ol><li>Build a pan-tilt servo bracket holding the miniature solar panel and 4 LDRs in a grid.</li><li>Connect servo power leads to external 5V power supply to handle motor stall currents.</li><li>Run code and shine a flashlight across panel to test auto-tracking alignment.</li></ol>
+            <h3>💻 Complete Source Code:</h3>
+            <pre>#include &lt;Servo.h&gt;
+Servo horizontal; Servo vertical;
+int servoh = 90; int servov = 90;
+
+void setup() {
+  horizontal.attach(9); vertical.attach(10);
+  horizontal.write(servoh); vertical.write(servov);
+}
+
+void loop() {
+  int tl = analogRead(A0); int tr = analogRead(A1);
+  int bl = analogRead(A2); int br = analogRead(A3);
+  
+  int avt = (tl + tr) / 2; int avd = (bl + br) / 2;
+  int avl = (tl + bl) / 2; int avr = (tr + br) / 2;
+  
+  if (avt &lt; avd &amp;&amp; servov &lt; 180) servov++;
+  else if (avd &lt; avt &amp;&amp; servov &gt; 0) servov--;
+  vertical.write(servov);
+  
+  if (avl &lt; avr &amp;&amp; servoh &lt; 180) servoh++;
+  else if (avr &lt; avl &amp;&amp; servoh &gt; 0) servoh--;
+  horizontal.write(servoh);
+  delay(50);
+}</pre>
+        </div>
+
+        <div class="project-card">
+            <h2>10. Touchless Smart Trash Can</h2>
+            <p>Automatically opens a dustbin lid using a servo motor when a hand approaches within 15 cm of the ultrasonic sensor.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x Arduino Uno or Nano</li><li>1x HC-SR04 Ultrasonic Sensor</li><li>1x SG90 Micro Servo Motor</li><li>1x Small Trash Can with Hinged Lid</li></ul>
+            <h3>🔌 Wiring Instructions:</h3>
+            <ul><li>HC-SR04 Trig to Pin 6, Echo to Pin 5, VCC to 5V, GND to GND.</li><li>SG90 Servo Signal to Pin 9, VCC to 5V, GND to GND.</li></ul>
+            <h3>📋 Step-by-Step Procedure:</h3>
+            <ol><li>Mount HC-SR04 on the front rim of dustbin facing forward.</li><li>Attach servo motor to bin lid hinge using a stiff push rod wire.</li><li>Calibrate servo angle in code to open lid to 90 degrees and auto-close after 3 seconds.</li></ol>
+            <h3>💻 Complete Source Code:</h3>
+            <pre>#include &lt;Servo.h&gt;
+Servo lidServo;
+const int trigPin = 6;
+const int echoPin = 5;
+
+void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  lidServo.attach(9);
+  lidServo.write(0); // Lid closed
+}
+
+void loop() {
+  digitalWrite(trigPin, LOW); delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH); delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  long duration = pulseIn(echoPin, HIGH);
+  int distance = duration * 0.034 / 2;
+  
+  if (distance &gt; 0 &amp;&amp; distance &lt; 15) {
+    lidServo.write(90); // Open
+    delay(3000);
+    lidServo.write(0);  // Close
+  }
+  delay(200);
+}</pre>
+        </div>
+
+    </div>
+
+    <!-- 10 NON-CODED PROJECTS -->
+    <div id="nonCodedSection" class="project-section">
+        
+        <div class="project-card">
+            <h2>1. Simple Transistor Touch Switch</h2>
+            <p>A touch-activated switch using a dual NPN transistor Darlington pair configuration to turn on an LED when human touch bridges contacts.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>2x BC547 NPN Transistors</li><li>1x 220Ω Resistor</li><li>1x 100kΩ Resistor</li><li>1x Red LED</li><li>1x 9V Battery & Snap Connector</li><li>1x Solderless Breadboard & Touch Wires</li></ul>
+            <h3>🔌 Circuit Wiring Instructions:</h3>
+            <ul><li>Connect 9V Positive rail to LED Anode through a 220Ω current limiting resistor.</li><li>Connect LED Cathode to Collector of Transistor 2.</li><li>Connect Emitter of Transistor 1 directly to Base of Transistor 2 (Darlington Pair Configuration).</li><li>Connect Emitter of Transistor 2 to 9V Ground rail.</li><li>Connect 100kΩ resistor from 9V Positive rail to Touch Pin A. Connect Base of Transistor 1 to Touch Pin B.</li></ul>
+            <h3>📋 Step-by-Step Assembly Procedure:</h3>
+            <ol><li>Insert both BC547 transistors onto breadboard facing flat sides forward.</li><li>Form Darlington pair by jumping Emitter 1 to Base 2.</li><li>Bridge touch wires; placing a finger across them passes microamp current to illuminate the LED.</li></ol>
+        </div>
+
+        <div class="project-card">
+            <h2>2. Dark-Detecting Night Light</h2>
+            <p>Automatically turns on an LED indicator when ambient light levels drop below a threshold determined by a photoresistor and variable resistor.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x Photoresistor (LDR)</li><li>1x BC547 NPN Transistor</li><li>1x 10k Potentiometer</li><li>1x 330Ω Resistor</li><li>1x Ultra-Bright White LED</li><li>1x 9V Battery & Clip</li></ul>
+            <h3>🔌 Circuit Wiring Instructions:</h3>
+            <ul><li>Create a voltage divider: connect LDR between 9V Positive rail and Transistor Base.</li><li>Connect 10k Potentiometer between Transistor Base and 9V Ground rail.</li><li>Connect LED Anode to 9V Positive rail through a 330Ω resistor.</li><li>Connect LED Cathode to Transistor Collector. Emitter connects directly to Ground.</li></ul>
+            <h3>📋 Step-by-Step Assembly Procedure:</h3>
+            <ol><li>Place LDR and potentiometer on breadboard to form adjustable bias network.</li><li>Adjust potentiometer knob until white LED just turns off under room lights.</li><li>Cover the LDR surface with your hand; the increased resistance triggers the transistor to light the LED.</li></ol>
+        </div>
+
+        <div class="project-card">
+            <h2>3. Transistor Audio Signal Amplifier</h2>
+            <p>Amplifies small audio signals from a phone headphone jack to drive a small 8-ohm speaker using a single transistor stage.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x 2N2222 or BC547 NPN Transistor</li><li>1x 10µF Electrolytic Capacitor</li><li>1x 10kΩ Resistor</li><li>1x 8-Ohm Miniature Speaker</li><li>1x 3.5mm Audio Jack Cable</li><li>1x 9V Battery</li></ul>
+            <h3>🔌 Circuit Wiring Instructions:</h3>
+            <ul><li>Connect Positive audio input lead to Positive pin of 10µF capacitor.</li><li>Connect Negative pin of 10µF capacitor to Transistor Base.</li><li>Connect 10kΩ biasing resistor between 9V Positive rail and Transistor Base.</li><li>Connect Speaker between 9V Positive rail and Transistor Collector.</li><li>Connect Transistor Emitter and Negative audio lead to 9V Ground rail.</li></ul>
+            <h3>📋 Step-by-Step Assembly Procedure:</h3>
+            <ol><li>Connect 3.5mm jack into audio source (phone or music player).</li><li>Insert coupling capacitor to block DC voltage offset from audio player.</li><li>Play music audio track to hear amplified sound from the 8-ohm speaker.</li></ol>
+        </div>
+
+        <div class="project-card">
+            <h2>4. Astable Multivibrator Dual LED Flasher</h2>
+            <p>Alternately flashes two LEDs back and forth continuously using RC charge/discharge timing cycles with zero microcontrollers.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>2x BC547 NPN Transistors</li><li>2x 10µF Electrolytic Capacitors</li><li>2x 47kΩ Resistors</li><li>2x 470Ω Resistors</li><li>2x LEDs (1 Red, 1 Green)</li><li>1x 9V Battery</li></ul>
+            <h3>🔌 Circuit Wiring Instructions:</h3>
+            <ul><li>Connect 470Ω resistors in series with Red LED to Collector 1, and Green LED to Collector 2.</li><li>Connect 47kΩ resistors from 9V Positive to Base 1 and Base 2.</li><li>Cross-couple: Connect Positive side of Capacitor 1 to Collector 1, Negative side to Base 2.</li><li>Connect Positive side of Capacitor 2 to Collector 2, Negative side to Base 1.</li><li>Connect both Emitters to Ground rail.</li></ul>
+            <h3>📋 Step-by-Step Assembly Procedure:</h3>
+            <ol><li>Wire two symmetric transistor stages on breadboard.</li><li>Add cross-coupling electrolytic capacitors paying strict attention to polarity.</li><li>Apply 9V power to watch LEDs alternate blinking automatically.</li></ol>
+        </div>
+
+        <div class="project-card">
+            <h2>5. Water Level Buzzer Indicator</h2>
+            <p>Sounds an audible alarm when water rises inside a vessel and bridges two bare copper wire probes.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x BC547 NPN Transistor</li><li>1x Active 5V/9V Buzzer</li><li>1x 1kΩ Resistor</li><li>2x Copper Probe Wires</li><li>1x 9V Battery</li></ul>
+            <h3>🔌 Circuit Wiring Instructions:</h3>
+            <ul><li>Connect Probe 1 wire directly to 9V Positive rail.</li><li>Connect Probe 2 wire to Transistor Base through a 1kΩ resistor.</li><li>Connect Active Buzzer Positive terminal to 9V Positive rail.</li><li>Connect Buzzer Negative terminal to Transistor Collector.</li><li>Connect Transistor Emitter to Ground rail.</li></ul>
+            <h3>📋 Step-by-Step Assembly Procedure:</h3>
+            <ol><li>Suspend two bare copper probe wires inside a plastic glass or container.</li><li>Fill glass with tap water.</li><li>When water reaches probe height, conductive water completes the base circuit to sound the buzzer.</li></ol>
+        </div>
+
+        <div class="project-card">
+            <h2>6. Continuity Tester Circuit</h2>
+            <p>Tests cables and circuit paths for unbroken electrical connections, sounding a buzzer and lighting an LED on low resistance.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x BC547 Transistor</li><li>1x 1kΩ Resistor</li><li>1x Red LED & 220Ω Resistor</li><li>1x Active Buzzer</li><li>2x Test Probes / Alligator Clips</li><li>1x 9V Battery</li></ul>
+            <h3>🔌 Circuit Wiring Instructions:</h3>
+            <ul><li>Connect Test Probe 1 directly to 9V Positive rail.</li><li>Connect Test Probe 2 through 1kΩ resistor to Transistor Base.</li><li>Connect LED with 220Ω resistor and Buzzer in parallel between 9V Positive and Collector.</li><li>Connect Emitter to Ground rail.</li></ul>
+            <h3>📋 Step-by-Step Procedure:</h3>
+            <ol><li>Touch Probe 1 and Probe 2 together to confirm self-test buzzer sound.</li><li>Place probes across fuses, wire traces, or switches to test continuity.</li></ol>
+        </div>
+
+        <div class="project-card">
+            <h2>7. IR Beam Intruder Security Alarm</h2>
+            <p>Triggers a latching security buzzer whenever an invisible infrared beam between an IR LED and Photodiode is broken.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x IR LED & 100Ω Resistor</li><li>1x IR Photodiode</li><li>1x BC547 NPN Transistor</li><li>1x Active Buzzer</li><li>1x 10kΩ Potentiometer</li><li>1x 9V Battery</li></ul>
+            <h3>🔌 Circuit Wiring Instructions:</h3>
+            <ul><li>Wire IR LED continuously ON through 100Ω resistor across 9V rails.</li><li>Connect Photodiode in reverse bias between 9V Positive and 10k Potentiometer to Transistor Base.</li><li>Connect Buzzer between 9V Positive and Collector. Emitter to Ground.</li></ul>
+            <h3>📋 Step-by-Step Procedure:</h3>
+            <ol><li>Align IR LED pointing directly into Photodiode across a doorway or path.</li><li>When beam is clear, photodiode conducts keeping transistor OFF.</li><li>Passing through beam breaks IR light, firing transistor and sounding buzzer alarm.</li></ol>
+        </div>
+
+        <div class="project-card">
+            <h2>8. Clap-Activated Relay Switch</h2>
+            <p>Uses an electret microphone and transistor pre-amp stage to toggle a relay when a sharp acoustic clap is detected.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x Electret Microphone</li><li>2x BC547 Transistors</li><li>1x 100µF Capacitor & 10µF Capacitor</li><li>1x 10kΩ, 1kΩ, 220Ω Resistors</li><li>1x 5V Relay Module</li><li>1x 9V Battery</li></ul>
+            <h3>🔌 Circuit Wiring Instructions:</h3>
+            <ul><li>Power electret microphone through 10kΩ resistor. Connect mic output through 10µF capacitor to Transistor 1 Base.</li><li>Collector 1 drives Base 2 through 100µF timing capacitor.</li><li>Collector 2 powers relay coil.</li></ul>
+            <h3>📋 Step-by-Step Procedure:</h3>
+            <ol><li>Assemble pre-amplifier transistor circuit on breadboard.</li><li>Clap hands near microphone to trigger transistor amplification spike and pull in relay contacts.</li></ol>
+        </div>
+
+        <div class="project-card">
+            <h2>9. 555 Timer PWM Motor Speed Controller</h2>
+            <p>Varies speed of a DC motor from 0% to 100% using pulse width modulation generated by a 555 timer IC and MOSFET.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x NE555 Timer IC</li><li>1x IRFZ44N N-Channel MOSFET</li><li>1x 100kΩ Potentiometer</li><li>2x 1N4148 Diodes</li><li>1x 0.1µF Capacitor</li><li>1x 12V DC Motor & 12V Battery</li></ul>
+            <h3>🔌 Circuit Wiring Instructions:</h3>
+            <ul><li>Wire 555 in astable mode using 1N4148 diodes attached to potentiometer wipers to split charge/discharge paths.</li><li>555 Pin 3 Output connects to MOSFET Gate.</li><li>Connect DC Motor between 12V Positive and MOSFET Drain. MOSFET Source to Ground.</li></ul>
+            <h3>📋 Step-by-Step Procedure:</h3>
+            <ol><li>Assemble 555 astable circuit on breadboard.</li><li>Connect 12V DC motor to MOSFET output.</li><li>Turn potentiometer knob to smoothly adjust motor speed without losing torque.</li></ol>
+        </div>
+
+        <div class="project-card">
+            <h2>10. Fire Temperature Resistance Alarm</h2>
+            <p>Uses an NTC thermistor in a bridge circuit to automatically trigger a warning siren when temperature exceeds limit.</p>
+            <h3>📦 Components Required:</h3>
+            <ul><li>1x 10k NTC Thermistor</li><li>1x BC547 Transistor</li><li>1x 10k Potentiometer</li><li>1x Active Buzzer & Red LED</li><li>1x 9V Battery</li></ul>
+            <h3>🔌 Circuit Wiring Instructions:</h3>
+            <ul><li>Connect 10k Thermistor between 9V Positive and Transistor Base.</li><li>Connect 10k Potentiometer between Transistor Base and Ground.</li><li>Connect Buzzer and Red LED in parallel between 9V Positive and Collector. Emitter to Ground.</li></ul>
+            <h3>📋 Step-by-Step Procedure:</h3>
+            <ol><li>Calibrate room temperature trigger point using potentiometer.</li><li>Bring a warm soldering iron or hot air source near thermistor. Resistance drops rapidly, turning transistor ON and activating siren.</li></ol>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

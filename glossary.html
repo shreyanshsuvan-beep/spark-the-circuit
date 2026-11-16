@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spark the Circuit - Embedded Systems Technical Glossary</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1e293b; padding: 30px; line-height: 1.6; }
+        .nav-container { max-width: 1200px; margin: 0 auto; }
+        .back-btn { display: inline-block; margin-bottom: 20px; color: #0284c7; text-decoration: none; font-weight: bold; font-size: 1rem; }
+        .back-btn:hover { text-decoration: underline; }
+        
+        header { text-align: center; margin-bottom: 40px; }
+        h1 { color: #0f172a; margin-bottom: 10px; font-size: 2.5rem; }
+        header p { color: #475569; font-size: 1.1rem; max-width: 800px; margin: 0 auto; }
+        
+        .search-box { width: 100%; max-width: 500px; padding: 12px 20px; margin: 0 auto 40px auto; display: block; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: #ffffff; outline: none; }
+        .search-box:focus { border-color: #0284c7; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
+
+        .glossary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+        .term-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .term-card h3 { color: #0284c7; margin-bottom: 10px; font-size: 1.25rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 6px; }
+        .term-card p { font-size: 0.92rem; color: #334155; line-height: 1.6; }
+    </style>
+    <script>
+        function filterGlossary() {
+            let input = document.getElementById('searchInput').value.toLowerCase();
+            let cards = document.getElementsByClassName('term-card');
+            for (let i = 0; i < cards.length; i++) {
+                let text = cards[i].innerText.toLowerCase();
+                cards[i].style.display = text.includes(input) ? "" : "none";
+            }
+        }
+    </script>
+</head>
+<body>
+
+<div class="nav-container">
+    <a href="index.html" class="back-btn">← Back to Homepage</a>
+
+    <header>
+        <h1>📖 Spark the Circuit - Technical Glossary</h1>
+        <p>Comprehensive professional definitions for 50 essential hardware, communication protocol, register, and firmware engineering terminologies.</p>
+    </header>
+
+    <input type="text" id="searchInput" class="search-box" onkeyup="filterGlossary()" placeholder="Search technical terms, protocols, or hardware definitions...">
+
+    <div class="glossary-grid" id="glossaryGrid">
+        
+        <div class="term-card"><h3>1. GPIO (General Purpose Input/Output)</h3><p>Pins on an integrated circuit or microcontroller that can be configured via software to act as digital input lines to read sensors or digital output lines to control LEDs, relays, and actuators.</p></div>
+        <div class="term-card"><h3>2. PWM (Pulse Width Modulation)</h3><p>A modulation technique used to encode specific amplitude information into a pulsed digital signal, frequently utilized for dimming LEDs, controlling servo motor angles, and regulating DC motor speeds.</p></div>
+        <div class="term-card"><h3>3. UART (Universal Asynchronous Receiver-Transmitter)</h3><p>A hardware communication protocol utilizing asynchronous serial data transmission over two dedicated signal lines (TX for transmission and RX for receiving) without a shared clock signal.</p></div>
+        <div class="term-card"><h3>4. SPI (Serial Peripheral Interface)</h3><p>A synchronous serial communication bus specification engineered for high-speed, short-distance data exchange between microcontrollers and peripheral ICs using master-slave architecture.</p></div>
+        <div class="term-card"><h3>5. I2C (Inter-Integrated Circuit)</h3><p>A synchronous multi-master, multi-slave packet-switched single-ended serial communication bus utilizing only two lines: Serial Data (SDA) and Serial Clock (SCL).</p></div>
+        <div class="term-card"><h3>6. ADC (Analog-to-Digital Converter)</h3><p>An electronic integrated circuit that samples continuous analog voltage signals and converts them into discrete digital numbers that microcontrollers can process mathematically.</p></div>
+        <div class="term-card"><h3>7. DAC (Digital-to-Analog Converter)</h3><p>A system that translates digital binary codes into continuous analog voltage or current signals, enabling true audio wave synthesis and precise analog control voltages.</p></div>
+        <div class="term-card"><h3>8. DMA (Direct Memory Access)</h3><p>A hardware feature allowing peripheral subsystems to transfer data directly to and from system RAM independently of the central processing unit, maximizing execution efficiency.</p></div>
+        <div class="term-card"><h3>9. ISR (Interrupt Service Routine)</h3><p>A specialized software callback function executed by microcontroller firmware immediately upon receiving a hardware or software interrupt signal, pausing main loop execution temporarily.</p></div>
+        <div class="term-card"><h3>10. Firmware</h3><p>Low-level persistent software stored in non-volatile flash memory that provides direct hardware control, initialization routines, and operating logic for specific electronic devices.</p></div>
+        <div class="term-card"><h3>11. Bootloader</h3><p>A small snippet of code stored in protected boot memory that executes upon system startup, responsible for initializing hardware and loading application firmware via USB or serial.</p></div>
+        <div class="term-card"><h3>12. Pull-up Resistor</h3><p>A resistor connected between a signal line and the positive supply voltage to ensure the line defaults to a defined HIGH logic state when no active driver pulls it LOW.</p></div>
+        <div class="term-card"><h3>13. Pull-down Resistor</h3><p>A resistor connected between a signal line and ground to ensure the line defaults to a stable LOW logic state, preventing floating inputs on digital pins.</p></div>
+        <div class="term-card"><h3>14. Watchdog Timer (WDT)</h3><p>An electronic hardware timer that automatically generates a system reset if the main program freezes or fails to reset the timer periodically due to software hangs.</p></div>
+        <div class="term-card"><h3>15. EEPROM</h3><p>Electrically Erasable Programmable Read-Only Memory. Non-volatile memory storage utilized by microcontrollers to retain calibration constants and user settings when powered off.</p></div>
+        <div class="term-card"><h3>16. Flash Memory</h3><p>Non-volatile computer memory capable of being electrically erased and reprogrammed in blocks, primarily used for storing compiled microcontroller firmware programs.</p></div>
+        <div class="term-card"><h3>17. SRAM (Static Random-Access Memory)</h3><p>Fast volatile semiconductor memory used to store active variable states, stack frames, and dynamic buffers during program execution.</p></div>
+        <div class="term-card"><h3>18. Registers</h3><p>Small, ultra-fast storage locations built directly inside the CPU core used to hold immediate data, memory addresses, and hardware configuration flags.</p></div>
+        <div class="term-card"><h3>19. Multiplexer (MUX)</h3><p>A combinational logic circuit that selects one of several analog or digital input signals and forwards the selected input into a single output line.</p></div>
+        <div class="term-card"><h3>20. Decoupling Capacitor</h3><p>A capacitor placed across power supply pins close to integrated circuits to suppress high-frequency voltage noise and stabilize transient current demands.</p></div>
+        <div class="term-card"><h3>21. Optocoupler</h3><p>An electronic component that transfers electrical signals between two isolated circuits using light waves, protecting sensitive microcontrollers from high-voltage spikes.</p></div>
+        <div class="term-card"><h3>22. Crystal Oscillator</h3><p>An electronic oscillator circuit that uses the mechanical resonance of a piezoelectric vibrating crystal of quartz to create an electrical signal with a precise clock frequency.</p></div>
+        <div class="term-card"><h3>23. Logic Level Shifter</h3><p>An active electronic circuit or module that safely translates digital signals operating at different voltages (e.g., converting 3.3V signals to 5V logic).</p></div>
+        <div class="term-card"><h3>24. H-Bridge</h3><p>An electronic circuit configuration utilizing four switching elements that enables DC electric motors to run in both forward and reverse directions.</p></div>
+        <div class="term-card"><h3>25. Schmitt Trigger</h3><p>A comparator circuit with hysteresis that converts noisy, slow-transition input waveforms into clean, sharp digital square waves.</p></div>
+        <div class="term-card"><h3>26. Step-Down (Buck) Converter</h3><p>A DC-to-DC power converter that steps down voltage from a higher DC input to a lower DC output with high energy conversion efficiency.</p></div>
+        <div class="term-card"><h3>27. LDO (Low-Dropout Regulator)</h3><p>A DC linear voltage regulator that can regulate the output voltage even when the supply voltage is very close to the output voltage.</p></div>
+        <div class="term-card"><h3>28. Open Drain / Open Collector</h3><p>An output stage configuration where the pin connects to ground through a transistor switch, requiring an external pull-up resistor to reach HIGH logic.</p></div>
+        <div class="term-card"><h3>29. Push-Pull Output</h3><p>A totem-pole output stage utilizing complementary transistors that actively drive output lines to both HIGH and LOW voltage rails.</p></div>
+        <div class="term-card"><h3>30. JTAG</h3><p>Joint Test Action Group. An industry standard protocol used for verifying board designs and testing integrated circuits via dedicated boundary-scan pins.</p></div>
+        <div class="term-card"><h3>31. SWD (Serial Wire Debug)</h3><p>A two-pin electrical alternative to JTAG used by ARM Cortex microcontrollers for debugging and firmware flashing.</p></div>
+        <div class="term-card"><h3>32. CAN Bus</h3><p>Controller Area Network. A robust vehicle bus standard designed to allow microcontrollers and devices to communicate with each other without a host computer.</p></div>
+        <div class="term-card"><h3>33. RS-485</h3><p>A differential serial communication standard used for long-distance, high-noise industrial data transmission over twisted-pair cables.</p></div>
+        <div class="term-card"><h3>34. USB HID (Human Interface Device)</h3><p>A device class definition for USB protocols that enables keyboards, mice, and custom macro pads to interact with host computers natively.</p></div>
+        <div class="term-card"><h3>35. BLE (Bluetooth Low Energy)</h3><p>A wireless personal area network technology designed for ultra-low power consumption in short-range IoT sensor deployments.</p></div>
+        <div class="term-card"><h3>36. Wi-Fi Stack</h3><p>A collection of networking protocols and TCP/IP software drivers enabling microcontrollers to connect to wireless routers and web servers.</p></div>
+        <div class="term-card"><h3>37. MQTT</h3><p>Message Queuing Telemetry Transport. An extremely lightweight publish-subscribe network protocol designed for constrained IoT devices.</p></div>
+        <div class="term-card"><h3>38. OTA (Over-The-Air) Updates</h3><p>The wireless method of distributing and installing new firmware versions to connected IoT microcontrollers via Wi-Fi networks.</p></div>
+        <div class="term-card"><h3>39. RTOS (Real-Time Operating System)</h3><p>An operating system intended to serve real-time application process requests with guaranteed predictable timing constraints.</p></div>
+        <div class="term-card"><h3>40. Multitasking</h3><p>The execution of multiple concurrent software tasks or threads managed by scheduling algorithms within microcontroller firmware.</p></div>
+        <div class="term-card"><h3>41. Polling</h3><p>A programming technique where the CPU continuously monitors the status of a peripheral or sensor in a tight loop to detect events.</p></div>
+        <div class="term-card"><h3>42. Interrupt Latency</h3><p>The time elapsed interval between the generation of an interrupt event and the execution of the first instruction in its corresponding ISR.</p></div>
+        <div class="term-card"><h3>43. Contact Debouncing</h3><p>The process of filtering out electrical contact bouncing noise generated by mechanical push buttons using hardware RC filters or software delay loops.</p></div>
+        <div class="term-card"><h3>44. PCB (Printed Circuit Board)</h3><p>A laminated non-conductive mechanical substrate with copper tracks and pads etched to electrically connect electronic components.</p></div>
+        <div class="term-card"><h3>45. SMD (Surface-Mount Device)</h3><p>Electronic components designed to be mounted directly onto the surface of a printed circuit board rather than through pre-drilled holes.</p></div>
+        <div class="term-card"><h3>46. Impedance</h3><p>The total measure of opposition that a circuit presents to alternating current consisting of resistance, inductive reactance, and capacitive reactance.</p></div>
+        <div class="term-card"><h3>47. Baud Rate</h3><p>The rate at which information is transferred in a communication channel, measured in symbols or pulses per second (e.g., 9600 baud).</p></div>
+        <div class="term-card"><h3>48. Schematic Diagram</h3><p>A technical blueprint drawing that represents the electrical connections and component symbols of an electronic circuit.</p></div>
+        <div class="term-card"><h3>49. Breadboard</h3><p>A solderless construction base used for building temporary electronic prototypes and testing experimental circuit designs.</p></div>
+        <div class="term-card"><h3>50. Soldering</h3><p>The process of joining different metal pieces together by melting filler metal (solder) into the joint at elevated temperatures.</p></div>
+
+    </div>
+</div>
+
+</body>
+</html>

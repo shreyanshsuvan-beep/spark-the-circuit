@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spark the Circuit - 15 Engineering Formulas</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; padding: 30px; line-height: 1.6; }
+        .container { max-width: 1350px; margin: 0 auto; }
+        .back-btn { display: inline-block; margin-bottom: 20px; color: #38bdf8; text-decoration: none; font-weight: bold; }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { color: #38bdf8; font-size: 2.8rem; margin-bottom: 10px; }
+        p { color: #94a3b8; font-size: 1.1rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 25px; box-shadow: 0 10px 15px rgba(0,0,0,0.3); }
+        .card h3 { color: #38bdf8; margin-bottom: 8px; font-size: 1.2rem; }
+        .card p { font-size: 0.9rem; color: #cbd5e1; margin-bottom: 12px; }
+        .formula { background: #0b0f19; color: #38bdf8; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 0.95rem; text-align: center; border: 1px solid #334155; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="index.html" class="back-btn">← Back to Homepage</a>
+    <header>
+        <h1>📐 15 Essential Engineering Formulas</h1>
+        <p>Core electrical and electronics equations for hardware design and calculations.</p>
+    </header>
+    <div class="grid">
+        <div class="card"><h3>1. Ohm's Law (Voltage)</h3><p>Calculate voltage given current and resistance.</p><div class="formula">V = I × R</div></div>
+        <div class="card"><h3>2. Ohm's Law (Current)</h3><p>Calculate current given voltage and resistance.</p><div class="formula">I = V / R</div></div>
+        <div class="card"><h3>3. Ohm's Law (Resistance)</h3><p>Calculate resistance given voltage and current.</p><div class="formula">R = V / I</div></div>
+        <div class="card"><h3>4. Electrical Power</h3><p>Calculate total power dissipation from voltage and current.</p><div class="formula">P = V × I</div></div>
+        <div class="card"><h3>5. Power via Resistance</h3><p>Power calculation using current squared and resistance.</p><div class="formula">P = I² × R</div></div>
+        <div class="card"><h3>6. LED Current-Limiting Resistor</h3><p>Calculate series resistor required for safe LED operation.</p><div class="formula">R = (Vs - Vf) / If</div></div>
+        <div class="card"><h3>7. Voltage Divider</h3><p>Calculate output voltage from two series resistors.</p><div class="formula">Vout = Vin × (R2 / (R1 + R2))</div></div>
+        <div class="card"><h3>8. Capacitive Reactance</h3><p>Opposition to AC current flow offered by a capacitor.</p><div class="formula">Xc = 1 / (2 × π × f × C)</div></div>
+        <div class="card"><h3>9. Inductive Reactance</h3><p>Opposition to AC current flow offered by an inductor.</p><div class="formula">Xl = 2 × π × f × L</div></div>
+        <div class="card"><h3>10. RC Low-Pass Filter Cutoff Frequency</h3><p>-3dB cutoff frequency for an RC filter circuit.</p><div class="formula">fc = 1 / (2 × π × R × C)</div></div>
+        <div class="card"><h3>11. Resistors in Series</h3><p>Total equivalent resistance for series connected resistors.</p><div class="formula">R_total = R1 + R2 + ... + Rn</div></div>
+        <div class="card"><h3>12. Resistors in Parallel</h3><p>Total equivalent resistance for parallel connected resistors.</p><div class="formula">1 / R_total = (1/R1) + (1/R2)</div></div>
+        <div class="card"><h3>13. Capacitors in Parallel</h3><p>Total equivalent capacitance for parallel capacitors.</p><div class="formula">C_total = C1 + C2 + ... + Cn</div></div>
+        <div class="card"><h3>14. Energy Stored in a Capacitor</h3><p>Electrostatic energy stored in a charged capacitor.</p><div class="formula">E = 0.5 × C × V²</div></div>
+        <div class="card"><h3>15. Energy Stored in an Inductor</h3><p>Magnetic field energy stored in an inductor.</p><div class="formula">E = 0.5 × L × I²</div></div>
+    </div>
+</div>
+</body>
+</html>

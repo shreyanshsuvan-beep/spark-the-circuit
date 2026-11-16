@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spark the Circuit - Board Pinouts Reference Guide</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1e293b; padding: 30px; line-height: 1.6; }
+        .nav-container { max-width: 1200px; margin: 0 auto; }
+        .back-btn { display: inline-block; margin-bottom: 20px; color: #0284c7; text-decoration: none; font-weight: bold; font-size: 1rem; }
+        .back-btn:hover { text-decoration: underline; }
+        
+        header { text-align: center; margin-bottom: 40px; }
+        h1 { color: #0f172a; margin-bottom: 10px; font-size: 2.5rem; }
+        header p { color: #475569; font-size: 1.1rem; max-width: 800px; margin: 0 auto; }
+        
+        .search-box { width: 100%; max-width: 500px; padding: 12px 20px; margin: 0 auto 40px auto; display: block; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: #ffffff; outline: none; }
+        .search-box:focus { border-color: #0284c7; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
+        .pinout-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 28px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .pinout-card h3 { color: #0284c7; margin-bottom: 12px; font-size: 1.35rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+        .pinout-card ul { margin-left: 20px; color: #334155; font-size: 0.92rem; }
+        .pinout-card li { margin-bottom: 8px; }
+    </style>
+    <script>
+        function filterPinouts() {
+            let input = document.getElementById('searchInput').value.toLowerCase();
+            let cards = document.getElementsByClassName('pinout-card');
+            for (let i = 0; i < cards.length; i++) {
+                let text = cards[i].innerText.toLowerCase();
+                cards[i].style.display = text.includes(input) ? "" : "none";
+            }
+        }
+    </script>
+</head>
+<body>
+
+<div class="nav-container">
+    <a href="index.html" class="back-btn">← Back to Homepage</a>
+
+    <header>
+        <h1>📌 Spark the Circuit - Board Pinouts Reference Guide</h1>
+        <p>Comprehensive pin mappings, power supply rails, communication bus layouts, and specialized peripheral assignments for 20 major development boards.</p>
+    </header>
+
+    <input type="text" id="searchInput" class="search-box" onkeyup="filterPinouts()" placeholder="Search pinouts by board name, interface, or protocol...">
+
+    <div class="grid" id="pinoutGrid">
+        
+        <div class="pinout-card">
+            <h3>1. Arduino Uno R3 Pinout</h3>
+            <ul>
+                <li><strong>Digital Pins 0-13:</strong> Digital I/O. Pins 3, 5, 6, 9, 10, 11 support PWM. Pins 0 (RX) and 1 (TX) handle Hardware Serial.</li>
+                <li><strong>Analog Inputs A0-A5:</strong> 10-bit ADC resolution (can double as digital pins 14-19).</li>
+                <li><strong>Power Rails:</strong> 5V regulated output, 3.3V output (~50mA), VIN barrel input, GND.</li>
+                <li><strong>Communication:</strong> SPI (Pins 10, 11, 12, 13), I2C (A4 for SDA, A5 for SCL).</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>2. Arduino Uno R4 Minima Pinout</h3>
+            <ul>
+                <li><strong>Digital Pins 0-13:</strong> 32-bit 5V tolerant I/O with enhanced sink/source current capacity.</li>
+                <li><strong>PWM Channels:</strong> Expanded hardware PWM across multiple timer channels.</li>
+                <li><strong>Analog Peripherals:</strong> 14-bit ADC resolution inputs plus 12-bit true Analog Output (DAC).</li>
+                <li><strong>Busses:</strong> SPI, I2C, and dedicated CAN bus interface pins.</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>3. Arduino Mega 2560 Pinout</h3>
+            <ul>
+                <li><strong>Digital I/O:</strong> 54 digital pins, with 15 providing PWM output capability.</li>
+                <li><strong>Analog Channels:</strong> 16 dedicated high-precision analog input pins (A0-A15).</li>
+                <li><strong>Serial Ports:</strong> 4 independent hardware UART serial ports (Serial0 to Serial3).</li>
+                <li><strong>Communication:</strong> Dedicated SPI pins (50-53) and I2C pins (SDA on 20, SCL on 21).</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>4. Arduino Nano Pinout</h3>
+            <ul>
+                <li><strong>Digital Pins D0-D13:</strong> Standard digital I/O with hardware serial on D0/D1 and PWM on D3, D5, D6, D9, D10, D11.</li>
+                <li><strong>Analog Inputs:</strong> 8 analog channels (A0 to A7) in a compact DIP layout.</li>
+                <li><strong>Power:</strong> 5V regulated output, 3.3V output, VIN input, dual GND pins.</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>5. ESP32 Dev Module Pinout</h3>
+            <ul>
+                <li><strong>GPIO Pins:</strong> 36 digital multi-function pins supporting touch, PWM, ADC, and DAC.</li>
+                <li><strong>Analog Inputs:</strong> 12-bit ADCs on ADC1 (GPIO 32-39) and ADC2. Note: ADC2 is disabled when Wi-Fi is active.</li>
+                <li><strong>Communication:</strong> 3 UARTs, 3 SPI busses, 2 I2C interfaces.</li>
+                <li><strong>Power:</strong> 3.3V logic levels (Strictly non-5V tolerant on GPIO). VIN 5V USB power rail.</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>6. ESP32-CAM Pinout</h3>
+            <ul>
+                <li><strong>Camera Interface:</strong> Dedicated parallel camera port connected to OV2640 sensor.</li>
+                <li><strong>MicroSD Card:</strong> SPI communication mapped to GPIO 14 (CLK), 15 (CMD), 2 (D0), 4 (D1), 12 (D2), 13 (D3).</li>
+                <li><strong>Free GPIOs:</strong> GPIO 0, 3 (RX), 1 (TX), 16 (Flash LED). Note GPIO 0 must be pulled LOW for flashing.</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>7. Raspberry Pi Pico Pinout</h3>
+            <ul>
+                <li><strong>GPIO Pins:</strong> 40 physical pins, with 26 multi-function 3.3V digital GPIOs.</li>
+                <li><strong>Analog Channels:</strong> 3 ADC inputs (ADC0, ADC1, ADC2) plus internal temperature sensor channel.</li>
+                <li><strong>Peripherals:</strong> 2 SPI controllers, 2 I2C controllers, 2 UART channels, 16 PWM channels, and Programmable I/O (PIO).</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>8. Raspberry Pi Pico W Pinout</h3>
+            <ul>
+                <li><strong>Wireless Module:</strong> Infineon CYW43439 connected via SPI to the RP2040 chip.</li>
+                <li><strong>GPIO Mapping:</strong> Identical physical pinout to standard Pico, with internal GPIO 23 controlling wireless power save.</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>9. NodeMCU ESP8266 Pinout</h3>
+            <ul>
+                <li><strong>Digital Pins:</strong> D0 to D8 mapped to internal ESP8266 GPIOs (GPIO 16, 5, 4, 0, 2, 14, 12, 13, 15).</li>
+                <li><strong>Analog Pin:</strong> Single dedicated analog input pin (A0) supporting 0-1V input range.</li>
+                <li><strong>Power Rails:</strong> 3.3V output, 5V USB output pin, GND.</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>10. STM32F103C8T6 Blue Pill Pinout</h3>
+            <ul>
+                <li><strong>Digital I/O:</strong> 37 5V-tolerant GPIO pins mapped across Port A, B, and C.</li>
+                <li><strong>Analog Inputs:</strong> 10 12-bit ADC channels.</li>
+                <li><strong>Serial Buses:</strong> 3 USARTs, 2 SPI interfaces, 2 I2C channels, and USB 2.0 full-speed interface.</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>11. STM32F411 Black Pill Pinout</h3>
+            <ul>
+                <li><strong>GPIOs:</strong> High-speed 3.3V ARM Cortex-M4 GPIOs with flexible alternate function remapping.</li>
+                <li><strong>Storage:</strong> SDIO interface for high-speed micro SD card communication.</li>
+                <li><strong>Peripherals:</strong> 5 SPI, 3 I2C, 3 USART, and 2 I2S audio interfaces.</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>12. Teensy 4.0 Pinout</h3>
+            <ul>
+                <li><strong>Digital I/O:</strong> 40 digital pin locations, 34 of which are 3.3V tolerant breadboard friendly.</li>
+                <li><strong>Analog Inputs:</strong> 2 dedicated analog inputs sampled by dual high-speed ADCs.</li>
+                <li><strong>Specialized:</strong> 3 I2C, 3 SPI, 7 Serial UARTs, and dedicated digital audio I2S pins.</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>13. Teensy 4.1 Pinout</h3>
+            <ul>
+                <li><strong>Expanded I/O:</strong> 55 total accessible pin locations, including underside solder pads for memory and Ethernet PHY.</li>
+                <li><strong>Storage:</strong> Onboard MicroSD socket wired directly to SDHC controller lines.</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>14. Seeeduino XIAO Pinout</h3>
+            <ul>
+                <li><strong>Digital Pins:</strong> 11 digital pins supporting PWM on all channels.</li>
+                <li><strong>Analog Inputs:</strong> 11 analog pins (10-bit ADC).</li>
+                <li><strong>Interfaces:</strong> 1 UART, 1 I2C, 1 SPI, and 1 DAC output channel in a miniature DIP package.</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>15. Arduino Leonardo Pinout</h3>
+            <ul>
+                <li><strong>Native USB:</strong> ATmega32U4 handling hardware USB HID without secondary bridge chips.</li>
+                <li><strong>Digital I/O:</strong> 20 pins, 7 PWM channels, 12 analog inputs. Separate hardware serial on pins 0 & 1.</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>16. Arduino Due Pinout</h3>
+            <ul>
+                <li><strong>3.3V Logic:</strong> 54 digital pins (12 PWM), 12 analog inputs, 4 UARTs, 2 DAC outputs, and 2 I2C lines. Strictly 3.3V non-5V tolerant.</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>17. Wemos D1 Mini Pinout</h3>
+            <ul>
+                <li><strong>Compact ESP8266:</strong> D1 (SCL), D2 (SDA), D3 (GPIO0), D4 (GPIO2 / LED), D5 (SCK), D6 (MISO), D7 (MOSI), D8 (CS), TX, RX, A0.</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>18. Digispark Attiny85 Pinout</h3>
+            <ul>
+                <li><strong>Micro Pinout:</strong> P0 (PWM/I2C), P1 (PWM/LED), P2 (Analog/I2C), P3 (USB D+), P4 (USB D-/Analog), P5 (Reset).</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>19. Adafruit Feather M0 Pinout</h3>
+            <ul>
+                <li><strong>Feather Standard:</strong> ATSAMD21G18 ARM processor with dedicated LiPo battery charging pins (BAT, EN), 20 GPIOs, and SPI/I2C headers.</li>
+            </ul>
+        </div>
+
+        <div class="pinout-card">
+            <h3>20. BBC micro:bit v2 Pinout</h3>
+            <ul>
+                <li><strong>Edge Connector:</strong> Large ring pins 0, 1, 2 for alligator clips plus 3V, GND, and comprehensive digital/analog bus access along the bottom edge.</li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
